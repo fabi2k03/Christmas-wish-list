@@ -51,6 +51,8 @@ public:
     // Move constructor
     WishItem(WishItem&& other) noexcept;
 
+    WishItem &operator=(WishItem &&other) noexcept;
+
     // Getters
     int getId() const { return id; }
     std::string getName() const { return name; }
@@ -78,7 +80,7 @@ public:
     // Utility
     std::string toString() const;
     std::string serialize() const;
-    static std::unique_ptr<WishItem> deserialize(std::string& data);
+    static std::unique_ptr<WishItem> deserialize(const std::string &data);
 
     //Static helper
     static std::string categoryToString(Category cat);

@@ -4,4 +4,5 @@ project(Chistmas_WishList)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(Chistmas_WishList main.cpp
-        wishlist.h)
+        wishlist.h
+        wishlist.cpp)
