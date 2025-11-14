@@ -41,4 +41,27 @@ WishItem *WishlistManager::findById(int id) {
     return (it != items.end()) ? it->get() : nullptr;
 }
 
-//FindByName
+std::vector<WishItem *> WishlistManager::findByName(const std::string &name) {
+    std::vector<WishItem *> result;
+    for (auto &item: items) {
+        if (item->getName().find(name) != std::string::npos) {
+            result.push_back(item.get());
+        }
+    }
+    return result;
+}
+
+std::vector<WishItem *> WishlistManager::findByCategory(Category cat) {
+    return filter([cat](const WishItem &item) {
+        return item.getCategory() == cat;
+    });
+}
+
+std::vector<WishItem *> WishlistManager::findByPriceRange(double min, double max) {
+    return filter([min, max](const WishItem &item) {
+        return item.getPrice() >= min && item.getPrice() <= max;
+    });
+}
+
+
+
