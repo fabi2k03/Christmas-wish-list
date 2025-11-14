@@ -9,4 +9,6 @@ add_executable(Chistmas_WishList main.cpp
         wishlist_manager.h
         wishlist_manager.cpp
         file_handler.h
-        file_handler.cpp)
+        file_handler.cpp
+        utils.h
+        utils.cpp)
