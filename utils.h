@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace Utlis {
+namespace Utils {
     void clearInput();
     void clearScreen();
     void pause();

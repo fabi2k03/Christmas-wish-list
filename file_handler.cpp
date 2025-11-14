@@ -81,7 +81,7 @@ bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string 
     return true;
 }
 
- bool importFromCSV(WishlistManager &manager, const std::string &csvFile) {
+ bool FileHandler::importFromCSV(WishlistManager &manager, const std::string &csvFile) {
     std::ifstream file(csvFile);
 
     if (!file.is_open()) {

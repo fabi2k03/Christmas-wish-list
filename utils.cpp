@@ -7,7 +7,7 @@
 #include <iostream>
 #include <limits>
 
-namespace Utlis {
+namespace Utils {
     void clearInput() {
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
