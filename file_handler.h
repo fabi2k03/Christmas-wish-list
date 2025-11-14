@@ -21,7 +21,7 @@ public:
 
     bool exportToCSV(const WishlistManager &manager, const std::string &csvFile);
 
-    bool importFromCSV(const WishlistManager &manager, const std::string &csvFile);
+    bool importFromCSV(WishlistManager &manager, const std::string &csvFile);
 };
 
 #endif //CHISTMAS_WISHLIST_FILE_HANDLER_H

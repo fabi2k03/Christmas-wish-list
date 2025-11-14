@@ -5,6 +5,9 @@
 #include "file_handler.h"
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <stdexcept>
 
 FileHandler::FileHandler(const std::string &filename) : filename(filename) {
 }
@@ -78,7 +81,7 @@ bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string 
     return true;
 }
 
-bool FileHandler::importFromCSV(WishlistManager &manager, const std::string &csvFile) {
+ bool importFromCSV(WishlistManager &manager, const std::string &csvFile) {
     std::ifstream file(csvFile);
 
     if (!file.is_open()) {
