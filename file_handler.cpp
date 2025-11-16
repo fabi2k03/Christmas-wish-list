@@ -21,15 +21,17 @@ bool FileHandler::save(const WishlistManager &manager) {
 
     file << manager.getOwner() << "\n";
 
+    std::cout << "[FileHandler] DEBUG: Saved owner: " << manager.getOwner() << std::endl;
+
     for (const auto &item: manager.getItems()) {
         file << item->serialize() << "\n";
     }
 
     file.close();
-    std::cout << "[FileHandler] Saved" << manager.getTotalItems() << "itmes to " << filename << std::endl;
+    std::cout << "[FileHandler] Saved " << manager.getTotalItems()
+              << " items for " << manager.getOwner() << " to " << filename << std::endl;
     return true;
 }
-
 bool FileHandler::load(WishlistManager &manager) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -37,13 +39,60 @@ bool FileHandler::load(WishlistManager &manager) {
         return false;
     }
 
-    std::string owner;
-    std::getline(file, owner);
-    manager.setOwner(owner);
+    file.seekg(0, std::ios::end);
+    if (file.tellg() == 0) {
+        std::cout << "[FileHandler] File is empty, starting fresh." << std::endl;
+        file.close();
+        return false;
+    }
+    file.seekg(0, std::ios::beg);
 
-    std::string line;
+    std::string firstLine;
+    std::getline(file, firstLine);
+
+    std::cout << "[FileHandler] DEBUG: First line: '" << firstLine << "' (length: " << firstLine.length() << ")" << std::endl;
+
     int count = 0;
+
+    // Skip empty lines at the beginning
+    while (firstLine.empty() && std::getline(file, firstLine)) {
+        std::cout << "[FileHandler] Skipping empty line" << std::endl;
+    }
+
+    if (firstLine.empty()) {
+        std::cout << "[FileHandler] File contains only empty lines" << std::endl;
+        file.close();
+        return false;
+    }
+
+    if (firstLine.find('|') != std::string::npos) {
+        // First line is an item - keep current owner
+        std::cout << "[FileHandler] No owner in file, keeping current owner: "<< manager.getOwner() << std::endl;
+
+        // Process first line as item
+        auto item = WishItem::deserialize(firstLine);
+        if (item) {
+            manager.addItem(std::move(item));
+            count++;
+        }
+    } else {
+        // First line is owner
+        if (!firstLine.empty()) {
+            std::cout << "[FileHandler] Setting owner from file: '" << firstLine << "'" << std::endl;
+            manager.setOwner(firstLine);
+        } else {
+            std::cout << "[FileHandler] Empty owner line, keeping current: "
+                      << manager.getOwner() << std::endl;
+        }
+    }
+
+    // Read remaining lines
+    std::string line;
     while (std::getline(file, line)) {
+        if (line.empty()) continue;
+
+        std::cout << "[FileHandler] DEBUG: Processing line: '" << line << "'" << std::endl;
+
         auto item = WishItem::deserialize(line);
         if (item) {
             manager.addItem(std::move(item));
@@ -52,8 +101,8 @@ bool FileHandler::load(WishlistManager &manager) {
     }
 
     file.close();
-    std::cout << "[FileHandler] Loaded " << count << " items from " << filename << std::endl;
-    return true;
+    std::cout << "[FileHandler] Loaded " << count << " items for owner: '" << manager.getOwner() << "'" << std::endl;
+    return count > 0;
 }
 
 bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string &csvFile) {

@@ -125,23 +125,39 @@ std::unique_ptr<WishItem> WishItem::deserialize(const std::string &data) {
         tokens.push_back(token);
     }
 
-    if (token.size() < 6) {
+    if (tokens.size() < 6) {
+        std::cerr << "[WishItem] deserialize: Not enough tokens ("
+                  << tokens.size() << "), expected at least 6" << std::endl;
         return nullptr;
     }
 
     auto item = std::make_unique<WishItem>();
-    item->id = std::stoi(tokens[0]);
-    item->name = tokens[1];
-    item->price = std::stod(tokens[2]);
-    item->purchased = (tokens[3] == "1");
-    item->category = static_cast<Category>(std::stoi(tokens[4]));
-    item->priority = static_cast<Priority>(std::stoi(tokens[5]));
 
-    if (tokens.size() > 6) {
-        item->notes = tokens[6];
-    }
-    if (tokens.size() > 7) {
-        item->link = tokens[7];
+    try {
+        item->id = std::stoi(tokens[0]);
+        item->name = tokens[1];
+        item->price = std::stod(tokens[2]);
+        item->purchased = (tokens[3] == "1");
+        item->category = static_cast<Category>(std::stoi(tokens[4]));
+        item->priority = static_cast<Priority>(std::stoi(tokens[5]));
+
+        if (tokens.size() > 6) {
+            item->notes = tokens[6];
+        }
+        if (tokens.size() > 7) {
+            item->link = tokens[7];
+        }
+
+        if (item->id >= nextId) {
+            nextId = item->id + 1;
+        }
+
+        std::cout << "[WishItem] Deserialized: ID=" << item->id
+                  << ", Name=" << item->name << std::endl;
+
+    } catch (const std::exception& e) {
+        std::cerr << "[WishItem] deserialize error: " << e.what() << std::endl;
+        return nullptr;
     }
 
     return item;
@@ -172,7 +188,7 @@ Category WishItem::stringToCategory(const std::string &str) {
     std::string lower = str;
     std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
 
-    if (lower == "toy") {
+    if (lower == "toys") {
         return Category::TOYS;
     }
     if (lower == "books") {
