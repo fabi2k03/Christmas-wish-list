@@ -22,6 +22,8 @@ void displayMenu() {
     std::cout << "11.   Save Wishlist\n";
     std::cout << "12.   Load Wishlist\n";
     std::cout << "13.   Export to CSV\n";
+    std::cout << "14.   Import from CSV\n";
+    std::cout << "15.   Switch User\n";
     std::cout << "0.    Exit\n";
 }
 
@@ -130,15 +132,15 @@ void sortMenu(WishlistManager &manager) {
             break;
     }
 
-    std::cout << "✓ Items sorted!\n";
+    std::cout << "Items sorted!\n";
     manager.displayAll();
 }
 
 void saveWishlist(WishlistManager &manager, FileHandler &fileHandler) {
     if (fileHandler.save(manager)) {
-        std::cout << "✓ Wishlist saved successfully!\n";
+        std::cout << "Wishlist saved successfully!\n";
     } else {
-        std::cout << "✗ Failed to save wishlist!\n";
+        std::cout << "Failed to save wishlist!\n";
     }
 }
 
@@ -176,6 +178,51 @@ void importFromCSV(WishlistManager &manager, FileHandler &fileHandler) {
     }
 }
 
+void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::string &currentOwner) {
+    std::cout << "=== SWITCH USER ===" << std::endl;
+
+    if (!Utils::confirm("Do you want to save the current wishlist before switching?")) {
+        if (!Utils::confirm("All unsaved changes will be lost. Continue?")) {
+            return;
+        }
+    } else {
+        fileHandler->save(*manager);
+        std::cout << "Wishlist saved for " << currentOwner << std::endl;
+    }
+
+    //Get new user
+    std::string newOwner = Utils::getStringInput("Enter new username: ");
+
+    if (newOwner.empty()) {
+        std::cout << "Invalid username. Switch cancelled.\n";
+        return;
+    }
+
+    if (newOwner == currentOwner) {
+        std::cout << "Already logged in as " << newOwner << ". Switch cancelled.\n";
+        return;
+    }
+
+    //Clean up old manager and file handler
+    delete manager;
+    delete fileHandler;
+
+    std::string newFilename = "wishlist_" + newOwner + ".dat";
+    currentOwner = newOwner;
+
+    manager = new WishlistManager(newOwner);
+    fileHandler = new FileHandler(newFilename);
+
+    std::cout << "Switching to " << newOwner << "'s wishlist... " << std::endl;
+    bool loaded = fileHandler->load(*manager);
+    if (loaded) {
+        std::cout << "Loaded wishlist for " << newOwner << "\n";
+        std::cout << "Found " << manager->getTotalItems() << " item(s).\n";
+    } else {
+        std::cout << "Starting fresh wishlist for " << newOwner << "\n";
+    }
+}
+
 
 int main() {
     std::cout << "╔══════════════════════════════════════╗\n";
@@ -183,19 +230,19 @@ int main() {
     std::cout << "╚══════════════════════════════════════╝\n\n";
 
     std::string ownerName = Utils::getStringInput("Enter your name: ");
-    std::string filename = "wishlist_"+ownerName+".dat";
+    std::string filename = "wishlist_" + ownerName + ".dat";
     std::cout << "\nYour wishlist will be saved to " << filename << std::endl;
 
-    WishlistManager manager(ownerName);
-    FileHandler fileHandler(filename);
+    WishlistManager *manager = new WishlistManager(ownerName);
+    FileHandler *fileHandler = new FileHandler(filename);
 
     std::cout << "\nChecking for existing wishlist...\n";
-    bool loaded = fileHandler.load(manager);
+    bool loaded = fileHandler->load(*manager);
 
     if (loaded) {
         std::cout << "Welcome back, " << ownerName << "!" << std::endl;
-        std::cout << "  Found " << manager.getTotalItems() << " item(s) in your wishlist.\n";
-    }else {
+        std::cout << "  Found " << manager->getTotalItems() << " item(s) in your wishlist.\n";
+    } else {
         std::cout << "Starting fresh wishlist for " << ownerName << "!\n";
     }
 
@@ -204,82 +251,86 @@ int main() {
 
     while (running) {
         displayMenu();
-        choice = Utils::getIntInput("\nYour choice: ", 0, 14);
+        choice = Utils::getIntInput("\nYour choice: ", 0, 15);
 
         switch (choice) {
             case 1:
-                addItemInteractive(manager);
+                addItemInteractive(*manager);
                 Utils::pause();
                 break;
 
             case 2:
-                manager.displayAll();
+                manager->displayAll();
                 Utils::pause();
                 break;
 
             case 3:
-                manager.displayPending();
+                manager->displayPending();
                 Utils::pause();
                 break;
 
             case 4:
-                manager.displayPurchased();
+                manager->displayPurchased();
                 Utils::pause();
                 break;
 
             case 5:
-                manager.displayByCategory();
+                manager->displayByCategory();
                 Utils::pause();
                 break;
 
             case 6:
-                searchByName(manager);
+                searchByName(*manager);
                 Utils::pause();
                 break;
 
             case 7:
-                markAsPurchased(manager);
+                markAsPurchased(*manager);
                 Utils::pause();
                 break;
 
             case 8:
-                removeItem(manager);
+                removeItem(*manager);
                 Utils::pause();
                 break;
 
             case 9:
-                manager.displayStatistics();
+                manager->displayStatistics();
                 Utils::pause();
                 break;
 
             case 10:
-                sortMenu(manager);
+                sortMenu(*manager);
                 Utils::pause();
                 break;
 
             case 11:
-                saveWishlist(manager, fileHandler);
+                saveWishlist(*manager, *fileHandler);
                 Utils::pause();
                 break;
 
             case 12:
-                loadWishlist(manager, fileHandler);
+                loadWishlist(*manager, *fileHandler);
                 Utils::pause();
                 break;
 
             case 13:
-                exportToCSV(manager, fileHandler);
+                exportToCSV(*manager, *fileHandler);
                 Utils::pause();
                 break;
 
             case 14:
-                importFromCSV(manager, fileHandler);
+                importFromCSV(*manager, *fileHandler);
+                Utils::pause();
+                break;
+            case 15:
+                switchUser(manager, fileHandler, ownerName);
                 Utils::pause();
                 break;
 
             case 0:
                 if (Utils::confirm("Save before exiting?")) {
-                    fileHandler.save(manager);
+                    fileHandler->save(*manager);
                 }
                 std::cout << "\n🎄 Merry Christmas! Goodbye! 🎅\n";
                 running = false;
@@ -290,6 +341,9 @@ int main() {
                 Utils::pause();
         }
     }
+
+    delete manager;
+    delete fileHandler;
 
     return 0;
 }
