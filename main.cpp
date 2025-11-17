@@ -1,11 +1,13 @@
 #include <iostream>
+#include <valarray>
+
 #include "utils.h"
 #include "wishlist_manager.h"
 #include "file_handler.h"
 
 void displayMenu() {
     std::cout << "\n╔══════════════════════════════════════╗\n";
-    std::cout << "║   🎄 CHRISTMAS WISHLIST MANAGER 🎄  ║\n";
+    std::cout << "║   🎄 CHRISTMAS WISHLIST MANAGER 🎄      ║\n";
     std::cout << "╚══════════════════════════════════════╝\n";
     std::cout << "1.    Add Item\n";
     std::cout << "2.    Display all Items\n";
@@ -181,12 +183,21 @@ int main() {
     std::cout << "╚══════════════════════════════════════╝\n\n";
 
     std::string ownerName = Utils::getStringInput("Enter your name: ");
+    std::string filename = "wishlist_"+ownerName+".dat";
+    std::cout << "\nYour wishlist will be saved to " << filename << std::endl;
 
     WishlistManager manager(ownerName);
-    FileHandler fileHandler("wishlist.dat");
+    FileHandler fileHandler(filename);
 
     std::cout << "\nChecking for existing wishlist...\n";
-    fileHandler.load(manager);
+    bool loaded = fileHandler.load(manager);
+
+    if (loaded) {
+        std::cout << "Welcome back, " << ownerName << "!" << std::endl;
+        std::cout << "  Found " << manager.getTotalItems() << " item(s) in your wishlist.\n";
+    }else {
+        std::cout << "Starting fresh wishlist for " << ownerName << "!\n";
+    }
 
     int choice;
     bool running = true;

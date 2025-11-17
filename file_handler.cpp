@@ -35,7 +35,7 @@ bool FileHandler::save(const WishlistManager &manager) {
 bool FileHandler::load(WishlistManager &manager) {
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Warning: Could not open file for reading: " << filename << std::endl;
+        //std::cerr << "Warning: Could not open file for reading: " << filename << std::endl;
         return false;
     }
 
