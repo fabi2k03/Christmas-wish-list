@@ -6,29 +6,30 @@
 #include <iomanip>
 #include <algorithm>
 #include <iostream>
+#include "logger.h"
 
 int WishItem::nextId = 1;
 
 WishItem::WishItem()
     : id(nextId++), name(""), price(0.0), purchased(false), category(Category::OTHER), priority(Priority::MEDIUM),
       notes(""), link("") {
-    std::cout << "[WishItem] Default constructor called (ID: " << id << ")" << std::endl;
+    LOG_DEBUG("WishItem: Default constructor called (ID: ", id, ")");
 }
 
 WishItem::WishItem(const std::string &name, double price, Category cat)
     : id(nextId++), name(name), price(price), purchased(false), category(cat), priority(Priority::MEDIUM), notes(""),
       link("") {
-    std::cout << "[WishItem] Parameterized constructor called (ID: " << id << ", Name: " << name << ")" << std::endl;
+    LOG_DEBUG("[WishItem] Parameterized constructor called (ID: ", id, ", Name: ", name , ")");
 }
 
 WishItem::~WishItem() {
-    std::cout << "[WishItem] Destructor called (ID: " << id << ", Name: " << name << ")" << std::endl;
+   LOG_DEBUG("[WishItem] Destructor called (ID: " , id , ", Name: " , name , ")");
 }
 
 WishItem::WishItem(const WishItem &other)
     : id(nextId++), name(other.name), price(other.price), purchased(other.purchased), category(other.category),
       priority(other.priority), notes(other.notes), link(other.link) {
-    std::cout << "[WishItem] Copy constructor called (New ID: " << id << ", From: " << other.id << ")" << std::endl;
+    LOG_DEBUG("[WishItem] Copy constructor called (New ID: " , id , ", From: " , other.id , ")");
 }
 
 WishItem &WishItem::operator=(const WishItem &other) {
@@ -40,7 +41,7 @@ WishItem &WishItem::operator=(const WishItem &other) {
         priority = other.priority;
         notes = other.notes;
         link = other.link;
-        std::cout << "[WishItem] Copy assignment called (ID: " << id << ", Name: " << name << ")" << std::endl;
+        LOG_DEBUG("[WishItem] Copy assignment called (ID: " , id , ", Name: " , name , ")");
     }
     return *this;
 }
@@ -52,7 +53,7 @@ WishItem::WishItem(WishItem &&other) noexcept
       link(std::move(other.link)) {
     other.id = 0;
     other.price = 0.0;
-    std::cout << "[WishItem] Move constructor called (ID: " << id << ")" << std::endl;
+    LOG_DEBUG("[WishItem] Move constructor called (ID: " , id , ")");
 }
 
 WishItem &WishItem::operator=(WishItem &&other) noexcept {
@@ -67,7 +68,7 @@ WishItem &WishItem::operator=(WishItem &&other) noexcept {
         link = std::move(other.link);
         other.id = 0;
         other.price = 0.0;
-        std::cout << "[WishItem] Move assignment called" << std::endl;
+        LOG_DEBUG("[WishItem] Move assignment called");
     }
     return *this;
 }
@@ -126,8 +127,7 @@ std::unique_ptr<WishItem> WishItem::deserialize(const std::string &data) {
     }
 
     if (tokens.size() < 6) {
-        std::cerr << "[WishItem] deserialize: Not enough tokens ("
-                  << tokens.size() << "), expected at least 6" << std::endl;
+        LOG_ERROR("[WishItem] deserialize: Not enough tokens (", tokens.size() , "), expected at least 6");
         return nullptr;
     }
 
@@ -152,11 +152,10 @@ std::unique_ptr<WishItem> WishItem::deserialize(const std::string &data) {
             nextId = item->id + 1;
         }
 
-        std::cout << "[WishItem] Deserialized: ID=" << item->id
-                  << ", Name=" << item->name << std::endl;
+       LOG_DEBUG("[WishItem] Deserialized: ID=" , item->id , ", Name=" , item->name);
 
     } catch (const std::exception& e) {
-        std::cerr << "[WishItem] deserialize error: " << e.what() << std::endl;
+        LOG_ERROR("[WishItem] deserialize error: " , e.what());
         return nullptr;
     }
 

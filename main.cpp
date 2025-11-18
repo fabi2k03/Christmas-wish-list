@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "wishlist_manager.h"
 #include "file_handler.h"
+#include "logger.h"
 
 void displayMenu() {
     std::cout << "\n╔══════════════════════════════════════╗\n";
@@ -225,6 +226,16 @@ void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::str
 
 
 int main() {
+    //Config Logger
+    Logger &logger = Logger::getInstance();
+    logger.setLogLevel(LogLevel::DEBUG);
+    logger.enableConsoleOutput(false);
+    logger.setLogFile("wishlist_app.log");
+
+    LOG_INFO("========================================");
+    LOG_INFO("Application started");
+    LOG_INFO("========================================");
+
     std::cout << "╔══════════════════════════════════════╗\n";
     std::cout << "║  Welcome to Christmas Wishlist App  ║\n";
     std::cout << "╚══════════════════════════════════════╝\n\n";

@@ -96,10 +96,10 @@ private:
 };
 
 // Global convenience macros
-#define LOG_DEBUG(...) logger::getInstance().debug(__VA_ARGS__)
-#define LOG_INFO(...) logger::getInstance().info(__VA_ARGS__)
-#define LOG_WARNING(...) logger::getInstance().warning(__VA_ARGS__)
-#define LOG_ERROR(...) logger::getInstance().error(__VA_ARGS__)
+#define LOG_DEBUG(...) Logger::getInstance().debug(__VA_ARGS__)
+#define LOG_INFO(...) Logger::getInstance().info(__VA_ARGS__)
+#define LOG_WARNING(...) Logger::getInstance().warning(__VA_ARGS__)
+#define LOG_ERROR(...) Logger::getInstance().error(__VA_ARGS__)
 
 
 #endif //CHISTMAS_WISHLIST_LOGGER_H
