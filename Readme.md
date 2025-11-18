@@ -72,5 +72,4 @@ wishlist.exe
 <div align="center">
 🎄 Happy Holidays! 🎅
 Made with ❤️ and C++
-⬆ Back to Top
 </div>
