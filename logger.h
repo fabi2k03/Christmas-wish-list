@@ -17,9 +17,9 @@ enum class LogLevel {
     DEBUG, INFO, WARNING, ERROR, NONE
 };
 
-class logger {
+class Logger {
 private:
-    static Logger *instance;
+    static Logger* instance;
     std::ofstream logFile;
     LogLevel currentLevel;
     std::mutex logMutex;
@@ -33,6 +33,8 @@ private:
 
 public:
     static Logger &getInstance();
+
+    ~Logger();
 
     Logger(const Logger &) = delete;
 
@@ -51,8 +53,6 @@ public:
     void info(const std::string &message);
 
     void warning(const std::string &message);
-
-    void error(const std::string &message);
 
     void error(const std::string &message);
 
