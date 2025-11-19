@@ -3,6 +3,7 @@
 //
 
 #include "wishlist_manager.h"
+#include "logger.h"
 
 #include <iostream>
 #include <map>
@@ -10,16 +11,16 @@
 #include <iomanip>
 
 WishlistManager::WishlistManager(const std::string &owner) : owner(owner) {
-    std::cout << "[WishlistManger] Created for: " << owner << std::endl;
+    LOG_INFO("[WishlistManger] Created for: " , owner);
 }
 
 WishlistManager::~WishlistManager() {
-    std::cout << "[WishlistManager] Destroying manager with: " << items.size() << " items" << std::endl;
+    LOG_INFO("[WishlistManager] Destroying manager with: " , items.size() ," items");
 }
 
 void WishlistManager::addItem(std::unique_ptr<WishItem> item) {
     if (item) {
-        std::cout << "[WishlistManager] Adding item: " << item->getName() << std::endl;
+        LOG_INFO("[WishlistManager] Adding item: " , item->getName());
         items.push_back(std::move(item));
     }
 }
@@ -29,10 +30,11 @@ bool WishlistManager::removeItem(int id) {
         return item->getId() == id;
     });
     if (it != items.end()) {
-        std::cout << "[WishlistManager] Removing item ID: " << id << std::endl;
+        LOG_INFO("[WishlistManager] Removing item ID: " , id);
         items.erase(it);
         return true;
     }
+    LOG_WARNING("WishlistManager: Item ID ", id, " not found for removal");
     return false;
 }
 
@@ -79,7 +81,7 @@ void WishlistManager::markAllPurchased() {
     for (auto &item: items) {
         item->setPurchased(true);
     }
-    std::cout << "[WishlistManager] Marked all itmes as purchased" << std::endl;
+    std::cout << "[WishlistManager] Marked all items as purchased" << std::endl;
 }
 
 void WishlistManager::clearAllPurchased() {

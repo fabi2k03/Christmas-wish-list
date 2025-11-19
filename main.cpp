@@ -356,5 +356,9 @@ int main() {
     delete manager;
     delete fileHandler;
 
+    LOG_INFO("========================================");
+    LOG_INFO("Application exiting normally");
+    LOG_INFO("========================================");
+
     return 0;
 }
