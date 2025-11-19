@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <limits>
+#include <climits>
 
 namespace Utils {
     void clearInput() {
