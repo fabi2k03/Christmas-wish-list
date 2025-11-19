@@ -6,6 +6,7 @@
 #define CHISTMAS_WISHLIST_UTILS_H
 
 #include <string>
+#include <climits>
 
 namespace Utils {
     void clearInput();
