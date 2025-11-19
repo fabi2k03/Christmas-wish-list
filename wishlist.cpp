@@ -8,6 +8,7 @@
 #include <iostream>
 #include "logger.h"
 #include <memory>
+#include <vector>
 
 int WishItem::nextId = 1;
 
