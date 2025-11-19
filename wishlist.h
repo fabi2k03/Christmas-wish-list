@@ -5,6 +5,7 @@
 #ifndef CHISTMAS_WISHLIST_WISHLIST_H
 #define CHISTMAS_WISHLIST_WISHLIST_H
 #include <string>
+#include <memory>
 
 enum class Priority {
     LOW,

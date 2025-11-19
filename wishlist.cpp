@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include "logger.h"
+#include <memory>
 
 int WishItem::nextId = 1;
 
