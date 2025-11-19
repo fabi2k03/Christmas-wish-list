@@ -176,7 +176,7 @@ void WishlistManager::displayPending() const {
 void WishlistManager::displayPurchased() const {
     std::cout << "\n=== PURCHASED ITEMS ===\n";
     for (const auto &item: items) {
-        if (!item->isPurchased()) {
+        if (item->isPurchased()) {
             std::cout << *item << "\n";
         }
     }

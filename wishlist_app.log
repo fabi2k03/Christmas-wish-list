@@ -1,0 +1,60 @@
+[2025-11-19 08:26:21] [INFO] ========================================
+[2025-11-19 08:26:21] [INFO] Application started
+[2025-11-19 08:26:21] [INFO] ========================================
+[2025-11-19 08:26:23] [INFO] [WishlistManger] Created for: Fabian
+[2025-11-19 08:26:23] [INFO] [FileHandler]: Initialized with filename wishlist_Fabian.dat
+[2025-11-19 08:26:23] [INFO] FileHandler: Attempting to load from 'wishlist_Fabian.dat'
+[2025-11-19 08:26:23] [WARNING] FileHandler: File 'wishlist_Fabian.dat' not found or could not be opened
+[2025-11-19 08:26:29] [DEBUG] WishItem: Default constructor called (ID: 1)
+[2025-11-19 08:27:27] [INFO] [WishlistManager] Adding item: Red Bull Racing Max Verstappen Mug
+[2025-11-19 08:28:05] [DEBUG] WishItem: Default constructor called (ID: 2)
+[2025-11-19 08:28:32] [INFO] [WishlistManager] Adding item: Red Bull Racing 2025 Team Water Resistant Jacket
+[2025-11-19 08:29:46] [DEBUG] WishItem: Default constructor called (ID: 3)
+[2025-11-19 08:30:14] [INFO] [WishlistManager] Adding item: Hogwarts™ Castle and Grounds
+[2025-11-19 08:32:25] [DEBUG] WishItem: Default constructor called (ID: 4)
+[2025-11-19 08:32:49] [INFO] [WishlistManager] Adding item: Talking Sorting Hat™
+[2025-11-19 08:33:09] [DEBUG] [FileHandler] DEBUG: Saved owner: Fabian
+[2025-11-19 08:33:09] [INFO] FileHandler: Successfully saved 4 items
+[2025-11-19 08:33:09] [INFO] [WishlistManager] Destroying manager with: 4 items
+[2025-11-19 08:33:09] [DEBUG] [WishItem] Destructor called (ID: 4, Name: Talking Sorting Hat™)
+[2025-11-19 08:33:09] [DEBUG] [WishItem] Destructor called (ID: 3, Name: Hogwarts™ Castle and Grounds)
+[2025-11-19 08:33:09] [DEBUG] [WishItem] Destructor called (ID: 2, Name: Red Bull Racing 2025 Team Water Resistant Jacket)
+[2025-11-19 08:33:09] [DEBUG] [WishItem] Destructor called (ID: 1, Name: Red Bull Racing Max Verstappen Mug)
+[2025-11-19 08:33:09] [INFO] ========================================
+[2025-11-19 08:33:09] [INFO] Application exiting normally
+[2025-11-19 08:33:09] [INFO] ========================================
+[2025-11-19 08:33:26] [INFO] ========================================
+[2025-11-19 08:33:26] [INFO] Application started
+[2025-11-19 08:33:26] [INFO] ========================================
+[2025-11-19 08:33:28] [INFO] [WishlistManger] Created for: Fabian
+[2025-11-19 08:33:28] [INFO] [FileHandler]: Initialized with filename wishlist_Fabian.dat
+[2025-11-19 08:33:28] [INFO] FileHandler: Attempting to load from 'wishlist_Fabian.dat'
+[2025-11-19 08:33:28] [DEBUG] FileHandler: First line read - 'Fabian'
+[2025-11-19 08:33:28] [INFO] FileHandler: Setting owner from file - 'Fabian'
+[2025-11-19 08:33:28] [DEBUG] FileHandler: Processing line - '1|Red Bull Racing Max Verstappen Mug|21|0|5|1|In Stock|21.00'
+[2025-11-19 08:33:28] [DEBUG] WishItem: Default constructor called (ID: 1)
+[2025-11-19 08:33:28] [DEBUG] [WishItem] Deserialized: ID=1, Name=Red Bull Racing Max Verstappen Mug
+[2025-11-19 08:33:28] [INFO] [WishlistManager] Adding item: Red Bull Racing Max Verstappen Mug
+[2025-11-19 08:33:28] [DEBUG] FileHandler: Processing line - '2|Red Bull Racing 2025 Team Water Resistant Jacket|171|0|3|2|Water Resistant, Unisex|https://f1store.formula1.com/en/red-bull-racing/red-bull-racing-2025-team-water-resistant-jacket-unisex/t-21971972+p-911167483292832+z-9-1238668011'
+[2025-11-19 08:33:28] [DEBUG] WishItem: Default constructor called (ID: 2)
+[2025-11-19 08:33:28] [DEBUG] [WishItem] Deserialized: ID=2, Name=Red Bull Racing 2025 Team Water Resistant Jacket
+[2025-11-19 08:33:28] [INFO] [WishlistManager] Adding item: Red Bull Racing 2025 Team Water Resistant Jacket
+[2025-11-19 08:33:28] [DEBUG] FileHandler: Processing line - '3|Hogwarts™ Castle and Grounds|169.99|0|0|0|Lego online store, Not a good product|Hogwarts™ Castle and Grounds'
+[2025-11-19 08:33:28] [DEBUG] WishItem: Default constructor called (ID: 3)
+[2025-11-19 08:33:28] [DEBUG] [WishItem] Deserialized: ID=3, Name=Hogwarts™ Castle and Grounds
+[2025-11-19 08:33:28] [INFO] [WishlistManager] Adding item: Hogwarts™ Castle and Grounds
+[2025-11-19 08:33:28] [DEBUG] FileHandler: Processing line - '4|Talking Sorting Hat™|99.99|1|0|1||https://www.lego.com/en-us/product/talking-sorting-hat-76429'
+[2025-11-19 08:33:28] [DEBUG] WishItem: Default constructor called (ID: 4)
+[2025-11-19 08:33:28] [DEBUG] [WishItem] Deserialized: ID=4, Name=Talking Sorting Hat™
+[2025-11-19 08:33:28] [INFO] [WishlistManager] Adding item: Talking Sorting Hat™
+[2025-11-19 08:33:28] [INFO] FileHandler: Successfully loaded 4 items for owner 'Fabian'
+[2025-11-19 08:33:34] [DEBUG] [FileHandler] DEBUG: Saved owner: Fabian
+[2025-11-19 08:33:34] [INFO] FileHandler: Successfully saved 4 items
+[2025-11-19 08:33:34] [INFO] [WishlistManager] Destroying manager with: 4 items
+[2025-11-19 08:33:34] [DEBUG] [WishItem] Destructor called (ID: 4, Name: Talking Sorting Hat™)
+[2025-11-19 08:33:34] [DEBUG] [WishItem] Destructor called (ID: 3, Name: Hogwarts™ Castle and Grounds)
+[2025-11-19 08:33:34] [DEBUG] [WishItem] Destructor called (ID: 2, Name: Red Bull Racing 2025 Team Water Resistant Jacket)
+[2025-11-19 08:33:34] [DEBUG] [WishItem] Destructor called (ID: 1, Name: Red Bull Racing Max Verstappen Mug)
+[2025-11-19 08:33:34] [INFO] ========================================
+[2025-11-19 08:33:34] [INFO] Application exiting normally
+[2025-11-19 08:33:34] [INFO] ========================================
