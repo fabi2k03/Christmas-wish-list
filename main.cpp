@@ -60,7 +60,7 @@ void searchByName(WishlistManager &manager) {
     auto results = manager.findByName(query);
 
     if (results.empty()) {
-        std::cout << "No items found matching '" << query;
+        std::cout << "No items found matching " << query;
     }
     std::cout << "\n=== SEARCH RESULTS ===\n";
     std::cout << "Found " << results.size() << " item(s):\n\n";
