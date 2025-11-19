@@ -1,4 +1,5 @@
 name: C++ Tests
+
 permissions:
   contents: read
   checks: write
@@ -17,48 +18,39 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
+      # Checkout the repository including submodules
       - uses: actions/checkout@v3
         with:
           submodules: recursive
 
+      # Install dependencies on Ubuntu
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ lcov
+          sudo apt-get install -y cmake g++
 
+      # Install dependencies on macOS
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew install cmake lcov
+          brew install cmake
 
+      # Configure CMake
       - name: Configure CMake
         run: |
-          mkdir build
+          mkdir -p build
           cd build
-          cmake -DCODE_COVERAGE=ON ..
+          cmake ..
 
+      # Build the project
       - name: Build
         run: |
           cd build
           cmake --build . --config Release
 
+      # Run tests
       - name: Run Tests
         run: |
           cd build
-          ./wishlist_tests --gtest_output=xml:test-results.xml
-
-      - name: Generate Coverage
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cd build
-          lcov --capture --directory . --output-file coverage.info
-          lcov --remove coverage.info '/usr/*' '*/external/*' '*/tests/*' --output-file coverage_filtered.info
-          lcov --list coverage_filtered.info
-
-      - name: Upload Coverage to Codecov
-        if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./build/coverage_filtered.info
-          fail_ci_if_error: true
+          ./wishlist_tests

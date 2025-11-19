@@ -64,11 +64,3 @@ endif()
 # Register tests with CTest
 include(GoogleTest)
 gtest_discover_tests(wishlist_tests)
-
-option(CODE_COVERAGE "Enable coverage reporting" OFF)
-
-if(CODE_COVERAGE AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    message(STATUS "Building with code coverage flags")
-    add_compile_options(--coverage -O0 -g)
-    add_link_options(--coverage)
-endif()
