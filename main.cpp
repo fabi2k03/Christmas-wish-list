@@ -153,6 +153,7 @@ void markAsPurchased(WishlistManager &manager) {
 
     if (item) {
         item->setPurchased(true);
+        manager.syncBudgetWithPurchases();
         std::cout << "✓ Item '" << item->getName() << "' marked as purchased!\n";
     } else {
         std::cout << "Error: Item with ID " << id << " not found!\n";
