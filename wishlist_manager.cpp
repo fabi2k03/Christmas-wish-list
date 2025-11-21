@@ -11,16 +11,16 @@
 #include <iomanip>
 
 WishlistManager::WishlistManager(const std::string &owner) : owner(owner) {
-    LOG_INFO("[WishlistManger] Created for: " , owner);
+    LOG_INFO("[WishlistManger] Created for: ", owner);
 }
 
 WishlistManager::~WishlistManager() {
-    LOG_INFO("[WishlistManager] Destroying manager with: " , items.size() ," items");
+    LOG_INFO("[WishlistManager] Destroying manager with: ", items.size(), " items");
 }
 
 void WishlistManager::addItem(std::unique_ptr<WishItem> item) {
     if (item) {
-        LOG_INFO("[WishlistManager] Adding item: " , item->getName());
+        LOG_INFO("[WishlistManager] Adding item: ", item->getName());
         items.push_back(std::move(item));
     }
 }
@@ -30,7 +30,7 @@ bool WishlistManager::removeItem(int id) {
         return item->getId() == id;
     });
     if (it != items.end()) {
-        LOG_INFO("[WishlistManager] Removing item ID: " , id);
+        LOG_INFO("[WishlistManager] Removing item ID: ", id);
         items.erase(it);
         return true;
     }
@@ -208,3 +208,129 @@ void WishlistManager::displayStatistics() const {
     std::cout << "Purchased Value: $" << getPurchasedValue() << "\n";
     std::cout << "Remaining Value: $" << getRemainingValue() << "\n";
 }
+
+void WishlistManager::setBudget(double amount) {
+    budget.setMaxBudget(amount);
+    syncBudgetWithPurchases();
+    LOG_INFO("WishlistManager: Budget set to ", amount, " for user ", owner);
+}
+
+Budget &WishlistManager::getBudget() {
+    return budget;
+}
+
+const Budget &WishlistManager::getBudget() const {
+    return budget;
+}
+
+void WishlistManager::enableBudget() {
+    budget.enable();
+    syncBudgetWithPurchases();
+    LOG_INFO("WishlistManager: Budget enabled for user, ", owner);
+}
+
+void WishlistManager::disableBudget() {
+    budget.disable();
+    LOG_INFO("WishlistManager: Budget disabled for user, ", owner);
+}
+
+void WishlistManager::resetBudget() {
+    budget.reset();
+    syncBudgetWithPurchases();
+    LOG_INFO("WishlistManager: Budget reset for user ", owner);
+}
+
+void WishlistManager::displayBudgetStatus() const {
+    if (!budget.isEnabled()) {
+        std::cout << "\n📊 Budget tracking is currently disabled.\n";
+        std::cout << "   Enable it in the Budget menu to track spending.\n";
+        return;
+    }
+
+    std::cout << "\n╔══════════════════════════════════════╗\n";
+    std::cout << "║         💰 BUDGET STATUS 💰         ║\n";
+    std::cout << "╚══════════════════════════════════════╝\n";
+
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "Max Budget:     €" << budget.getMaxBudget() << "\n";
+    std::cout << "Spent:          €" << budget.getSpentAmount() << "\n";
+    std::cout << "Remaining:      €" << budget.getRemaining() << "\n";
+    std::cout << "Used:           " << budget.getSpendingPercentage() << "%\n";
+    std::cout << "\nStatus:         " << budget.getStatusMessage() << "\n";
+
+    // Visual progress bar
+    int barWidth = 40;
+    int progress = static_cast<int>(budget.getSpendingPercentage() / 100.0 * barWidth);
+    if (progress > barWidth) progress = barWidth;
+
+    std::cout << "\nProgress:       [";
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < progress) {
+            if (budget.isOverBudget()) {
+                std::cout << "█"; // Red/full if over budget
+            } else if (budget.isNearLimit(0.8)) {
+                std::cout << "▓"; // Warning
+            } else {
+                std::cout << "▓"; // Normal
+            }
+        } else {
+            std::cout << "░";
+        }
+    }
+    std::cout << "]\n";
+
+    // Breakdown by category
+    if (!items.empty()) {
+        std::cout << "\n--- Spending by Category ---\n";
+        std::map<Category, double> categorySpending;
+
+        for (const auto &item: items) {
+            if (item->isPurchased()) {
+                categorySpending[item->getCategory()] += item->getPrice();
+            }
+        }
+
+        for (const auto &[cat, amount]: categorySpending) {
+            std::cout << "  " << WishItem::categoryToString(cat) << ": €" << amount << "\n";
+        }
+    }
+
+    std::cout << "\n";
+}
+
+bool WishlistManager::checkBudgetBevorAdd(double price) const {
+    if (!budget.isEnabled()) return true;
+
+    double potentialSpent = budget.getSpentAmount() + price;
+    double potentialRemaining = budget.getMaxBudget() - potentialSpent;
+
+    if (potentialSpent > budget.getMaxBudget()) {
+        std::cout << "\nBUDGET WARNING!\n";
+        std::cout << "Adding this item would exceed your budget:\n";
+        std::cout << "  Current spent:    €" << std::fixed << std::setprecision(2) << budget.getSpentAmount() << "\n";
+        std::cout << "  Item price:       €" << price << "\n";
+        std::cout << "  Would be:         €" << potentialSpent << "\n";
+        std::cout << "  Budget:           €" << budget.getMaxBudget() << "\n";
+        std::cout << "  Over by:          €" << (potentialSpent - budget.getMaxBudget()) << "\n";
+        return false;
+    }
+
+    if (potentialRemaining < budget.getMaxBudget() * 0.2) {
+        std::cout << "\n Budget Notice: Only €" << potentialRemaining << " remaining after this purchase. \n";
+    }
+    return true;
+}
+
+void WishlistManager::syncBudgetWithPurchases() {
+    if (!budget.isEnabled()) return;
+
+    double totalPurchased = getPurchasedValue();
+    budget.setSpentAmount(totalPurchased);
+
+    LOG_DEBUG("WishlistManager: Synced budget with purchases. Spent: ", totalPurchased);
+}
+
+void WishlistManager::updateBudgetFromItems() {
+    syncBudgetWithPurchases();
+}
+
