@@ -30,7 +30,7 @@ public:
     double getSpentAmount() const;
     bool isEnabled() const;
     double getRemaining() const;
-    double getSpentAmount() const;
+    double getSpendingPercentage() const;
 
     //Operations
     void addExpense(double amount);
