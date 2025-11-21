@@ -11,20 +11,20 @@
 #include <stdexcept>
 
 FileHandler::FileHandler(const std::string &filename) : filename(filename) {
-    LOG_INFO("[FileHandler]: Initialized with filename " , filename);
+    LOG_INFO("[FileHandler]: Initialized with filename ", filename);
 }
 
 bool FileHandler::save(const WishlistManager &manager) {
     std::ofstream file(filename);
     if (!file.is_open()) {
-        LOG_ERROR("[FileHandler]: Could not open file for writing: " , filename);
+        LOG_ERROR("[FileHandler]: Could not open file for writing: ", filename);
         std::cerr << "Error: Could not open file for writing: " << filename << std::endl;
         return false;
     }
 
     file << manager.getOwner() << "\n";
 
-    LOG_DEBUG("[FileHandler] DEBUG: Saved owner: " , manager.getOwner());
+    file << "BUDGET:" << manager.getBudget().serialize() << "\n";
 
     for (const auto &item: manager.getItems()) {
         file << item->serialize() << "\n";
@@ -35,6 +35,7 @@ bool FileHandler::save(const WishlistManager &manager) {
     std::cout << "Wishlist saved successfully!\n";
     return true;
 }
+
 bool FileHandler::load(WishlistManager &manager) {
     LOG_INFO("FileHandler: Attempting to load from '", filename, "'");
 
@@ -45,10 +46,11 @@ bool FileHandler::load(WishlistManager &manager) {
         return false;
     }
 
+    // Check if file is empty
     file.seekg(0, std::ios::end);
     if (file.tellg() == 0) {
         LOG_INFO("FileHandler: File is empty, starting fresh");
-        std::cout << "Starting fresh wishlist!\n";
+        std::cout << "✓ Starting fresh wishlist!\n";
         file.close();
         return false;
     }
@@ -72,25 +74,46 @@ bool FileHandler::load(WishlistManager &manager) {
         return false;
     }
 
+    // Check if first line is owner or item (old format)
     if (firstLine.find('|') != std::string::npos) {
-        // First line is an item - keep current owner
+        // Old format: First line is an item
         LOG_INFO("FileHandler: Old format detected (no owner line), keeping current owner");
 
-        // Process first line as item
         auto item = WishItem::deserialize(firstLine);
         if (item) {
             manager.addItem(std::move(item));
             count++;
         }
     } else {
-        // First line is owner
+        // New format: First line is owner
         if (!firstLine.empty()) {
             LOG_INFO("FileHandler: Setting owner from file - '", firstLine, "'");
             manager.setOwner(firstLine);
         }
     }
 
-    // Read remaining lines
+    // Read second line - could be BUDGET: or an item
+    std::string secondLine;
+    std::getline(file, secondLine);
+
+    if (secondLine.find("BUDGET:") == 0) {
+        // Budget line found
+        std::string budgetData = secondLine.substr(7); // Remove "BUDGET:" prefix
+        Budget loadedBudget = Budget::deserialize(budgetData);
+        manager.getBudget() = loadedBudget;
+        LOG_INFO("FileHandler: Loaded budget data");
+    } else {
+        // No budget line, this is an item
+        if (!secondLine.empty() && secondLine.find('|') != std::string::npos) {
+            auto item = WishItem::deserialize(secondLine);
+            if (item) {
+                manager.addItem(std::move(item));
+                count++;
+            }
+        }
+    }
+
+    // Read remaining lines (all items)
     std::string line;
     while (std::getline(file, line)) {
         if (line.empty()) continue;
@@ -105,6 +128,10 @@ bool FileHandler::load(WishlistManager &manager) {
     }
 
     file.close();
+
+    // Sync budget with loaded purchases
+    manager.syncBudgetWithPurchases();
+
     LOG_INFO("FileHandler: Successfully loaded ", count, " items for owner '", manager.getOwner(), "'");
     std::cout << "Loaded " << count << " item(s) from wishlist\n";
     return count > 0;
@@ -113,7 +140,7 @@ bool FileHandler::load(WishlistManager &manager) {
 bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string &csvFile) {
     std::ofstream file(csvFile);
     if (!file.is_open()) {
-        LOG_ERROR("Error: Could not open file for writing: " , csvFile );
+        LOG_ERROR("Error: Could not open file for writing: ", csvFile);
         return false;
     }
 
@@ -136,11 +163,11 @@ bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string 
     return true;
 }
 
- bool FileHandler::importFromCSV(WishlistManager &manager, const std::string &csvFile) {
+bool FileHandler::importFromCSV(WishlistManager &manager, const std::string &csvFile) {
     std::ifstream file(csvFile);
 
     if (!file.is_open()) {
-        LOG_ERROR("Error: Could not open CSV file: " , csvFile);
+        LOG_ERROR("Error: Could not open CSV file: ", csvFile);
         return false;
     }
 
@@ -169,7 +196,7 @@ bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string 
         }
 
         if (tokens.size() < 4) {
-            LOG_WARNING("Warning: Skipping invalid line: " , line);
+            LOG_WARNING("Warning: Skipping invalid line: ", line);
             std::cerr << "Warning: Skipping invalid line: " << line << std::endl;
             continue;
         }
@@ -213,14 +240,14 @@ bool FileHandler::exportToCSV(const WishlistManager &manager, const std::string 
             manager.addItem(std::move(item));
             count++;
         } catch (const std::exception &e) {
-            LOG_WARNING("Warning: Error parsing line: " , line , " (" , e.what() , ")");
+            LOG_WARNING("Warning: Error parsing line: ", line, " (", e.what(), ")");
             std::cerr << "Warning: Error parsing line: " << line << " (" << e.what() << ")" << std::endl;
             continue;
         }
     }
 
     file.close();
-    LOG_INFO("[FileHandler] Imported " , count , " items from CSV: " , csvFile);
+    LOG_INFO("[FileHandler] Imported ", count, " items from CSV: ", csvFile);
     std::cout << "Imported " << count << " item(s) from CSV successfully!\n";
 
     return count > 0;

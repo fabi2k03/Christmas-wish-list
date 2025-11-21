@@ -10,11 +10,11 @@
 
 using namespace std;
 
-Budget::Budget() : maxAmount(0.0), spentAmount(0.0), enabled(false) {
+Budget::Budget() : maxBudget(0.0), spentAmount(0.0), enabled(false) {
     LOG_DEBUG("Budget: Default constructor called");
 }
 
-Budget::Budget(double maxBudget) : maxAmount(maxBudget), spentAmount(0.0), enabled(true) {
+Budget::Budget(double maxBudget) : maxBudget(maxBudget), spentAmount(0.0), enabled(true) {
     LOG_INFO("Budget: Created with max budget: ", maxBudget);
 }
 
@@ -24,7 +24,7 @@ void Budget::setMaxBudget(double amount) {
         return;
     }
     maxBudget = amount;
-    enable = true;
+    enabled = true;
     LOG_INFO("Budget: Set max budget to: ", amount);
 }
 
@@ -38,12 +38,12 @@ void Budget::setSpentAmount(double amount) {
 }
 
 void Budget::enable() {
-    enable = true;
+    enabled = true;
     LOG_INFO("Budget: Enabled");
 }
 
 void Budget::disable() {
-    enable = false;
+    enabled = false;
     LOG_INFO("Budget: Disabled");
 }
 
@@ -144,7 +144,7 @@ string Budget::serialize() const {
     return ss.str();
 }
 
-static Budget Budget::deserialize(string &data) {
+Budget Budget::deserialize(string &data) {
     Budget budget;
     stringstream ss(data);
     string token;

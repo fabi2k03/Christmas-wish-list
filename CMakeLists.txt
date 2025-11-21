@@ -31,7 +31,10 @@ add_executable(Chistmas_WishList main.cpp
         utils.h
         utils.cpp
         logger.h
-        logger.cpp)
+        logger.cpp
+        budget.cpp
+        budget.h
+)
 
 set(SOURCE_FILES
         wishlist.cpp
