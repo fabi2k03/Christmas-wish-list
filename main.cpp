@@ -25,7 +25,68 @@ void displayMenu() {
     std::cout << "13.   Export to CSV\n";
     std::cout << "14.   Import from CSV\n";
     std::cout << "15.   Switch User\n";
+    std::cout << "16.   Budget Management \n";
     std::cout << "0.    Exit\n";
+}
+void budgetMenu(WishlistManager  &manager) {
+    while (true) {
+        std::cout << "\n╔══════════════════════════════════════╗\n";
+        std::cout << "║       💰 BUDGET MANAGEMENT 💰        ║\n";
+        std::cout << "╚══════════════════════════════════════╝\n";
+        std::cout << "1. Set Budget\n";
+        std::cout << "2. View Budget Status\n";
+        std::cout << "3. Enable Budget Tracking\n";
+        std::cout << "4. Disable Budget Tracking\n";
+        std::cout << "5. Reset Spent Amount\n";
+        std::cout << "6. Sync with Purchases\n";
+        std::cout << "0. Back to Main Menu\n";
+
+        int choice = Utils::getIntInput("\nYour choice: ", 0, 6);
+
+        switch (choice) {
+            case 1: {
+                double amount = Utils::getDoubleInput("Enter maximum budget (€): ", 0.0);
+                manager.setBudget(amount);
+                std::cout << "Budget set to € " << std::fixed << std::setprecision(2) << amount << "\n";
+                manager.displayBudgetStatus();
+                Utils::pause();
+                break;
+            }
+            case 2:
+                manager.displayBudgetStatus();
+                Utils::pause();
+                break;
+            case 3:
+                manager.enableBudget();
+                std::cout << "Budget tracking enabled!\n";
+                 manager.displayBudgetStatus();
+                Utils::pause();
+                break;
+            case 4:
+                manager.disableBudget();
+                std::cout << "Budget tracking disabled!\n";
+                Utils::pause();
+                break;
+            case 5:
+                if (Utils::confirm("Reset spent amount to 0€? This will clear purchase tracking.")) {
+                    manager.resetBudget();
+                    std::cout << "Budget spent amount reset to 0€\n";
+                }
+                Utils::pause();
+                break;
+            case 6:
+                manager.syncBudgetWithPurchases();
+                std::cout << "Budget synced with purchased item \n";
+                manager.displayBudgetStatus();
+                Utils::pause();
+                break;
+            case 0:
+                return;
+            default:
+                std::cout << "Invalid choice!\n";
+                Utils::pause();
+        }
+    }
 }
 
 void addItemInteractive(WishlistManager &manager) {
@@ -36,6 +97,13 @@ void addItemInteractive(WishlistManager &manager) {
 
     double price = Utils::getDoubleInput("Price (€): ");
     item->setPrice(price);
+
+    if (!manager.checkBudgetBevorAdd(price)) {
+        if (!Utils::confirm("Add item anyway")) {
+            std::cout << "Item not added!\n";
+            return;
+        }
+    }
 
     std::cout << "\nCategories: toys, books, electronics, clothing, sports, other\n";
     std::string catStr = Utils::getStringInput("Category: ");
@@ -85,6 +153,7 @@ void markAsPurchased(WishlistManager &manager) {
 
     if (item) {
         item->setPurchased(true);
+        manager.syncBudgetWithPurchases();
         std::cout << "✓ Item '" << item->getName() << "' marked as purchased!\n";
     } else {
         std::cout << "Error: Item with ID " << id << " not found!\n";
@@ -262,7 +331,7 @@ int main() {
 
     while (running) {
         displayMenu();
-        choice = Utils::getIntInput("\nYour choice: ", 0, 15);
+        choice = Utils::getIntInput("\nYour choice: ", 0, 16);
 
         switch (choice) {
             case 1:
@@ -337,6 +406,9 @@ int main() {
             case 15:
                 switchUser(manager, fileHandler, ownerName);
                 Utils::pause();
+                break;
+            case 16:
+                budgetMenu(*manager);
                 break;
 
             case 0:

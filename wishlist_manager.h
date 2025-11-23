@@ -10,6 +10,7 @@
 #include <functional>
 
 #include "wishlist.h"
+#include "budget.h"
 
 enum class SortOrder {
     BY_PRIORITY,
@@ -24,6 +25,9 @@ class WishlistManager {
 private:
     std::vector<std::unique_ptr<WishItem>> items;
     std::string owner;
+    Budget budget;
+
+    void updateBudgetFromItems();
 
 public:
     explicit WishlistManager(const std::string &owner = "Default");
@@ -71,6 +75,16 @@ public:
     void setOwner(const std::string &owner) {
         this->owner = owner;
     }
+
+    void setBudget(double amount);
+    Budget &getBudget();
+    const Budget &getBudget() const;
+    void enableBudget();
+    void disableBudget();
+    void resetBudget();
+    void displayBudgetStatus() const;
+    bool checkBudgetBevorAdd(double price) const;
+    void syncBudgetWithPurchases();
 };
 
 #endif //CHISTMAS_WISHLIST_WISHLIST_MANAGER_H
