@@ -42,6 +42,7 @@ set(SOURCE_FILES
         file_handler.cpp
         utils.cpp
         logger.cpp
+        budget.cpp
 )
 
 # Test executable
