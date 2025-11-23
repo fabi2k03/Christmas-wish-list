@@ -21,6 +21,16 @@ efficiently.
 - **Multiple Sort Options** - Sort by price, name, category, priority or ID
 - **Notes & Links** - Add detailed notes and product URLs
 
+### Budget Management
+A brand-new budgeting system helps you stay financially safe while planning your Christmas shopping.
+- **Enable/Disable Budget** - Turn budget tracking on or off
+- **Set Maximum Budget** - Define how much you want to spend
+- **Automatic Spent Tracking** - Every purchased item update the budget
+- **Remaining Budget Calculation** - Know instantly how much money you have left
+- **Near Limit Warnings** - Receive alerts when reaching 80-90% of the budget
+- **Over-Budget-Detection** - Clear warning when spending exceeds the budget
+- ...
+
 ---
 
 ## 🚀 Installation
