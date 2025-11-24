@@ -34,6 +34,7 @@ add_executable(Chistmas_WishList src/main.cpp
         src/logger.cpp
         src/budget.cpp
         include/budget.h
+        include/database_handler.h
 )
 
 set(SOURCE_FILES
