@@ -2,8 +2,8 @@
 // Created by Fabian Kopf on 11.11.25.
 //
 
-#include "wishlist_manager.h"
-#include "logger.h"
+#include "../include/wishlist_manager.h"
+#include "../include/logger.h"
 
 #include <iostream>
 #include <map>

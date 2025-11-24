@@ -2,7 +2,7 @@
 // Created by Fabian Kopf on 14.11.25.
 //
 
-#include "utils.h"
+#include "../include/utils.h"
 
 #include <iostream>
 #include <limits>

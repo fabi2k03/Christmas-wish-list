@@ -5,7 +5,7 @@
 #define TEST_HELPERS_H
 
 #include <memory>
-#include "../wishlist.h"
+#include "../include/wishlist.h"
 #include "../wishlist_manager.h"
 
 namespace TestHelpers {

@@ -21,28 +21,28 @@ FetchContent_MakeAvailable(googletest)
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(Chistmas_WishList main.cpp
-        wishlist.h
-        wishlist.cpp
-        wishlist_manager.h
-        wishlist_manager.cpp
-        file_handler.h
-        file_handler.cpp
-        utils.h
-        utils.cpp
-        logger.h
-        logger.cpp
-        budget.cpp
-        budget.h
+add_executable(Chistmas_WishList src/main.cpp
+        include/wishlist.h
+        src/wishlist.cpp
+        include/wishlist_manager.h
+        src/wishlist_manager.cpp
+        include/file_handler.h
+        src/file_handler.cpp
+        include/utils.h
+        src/utils.cpp
+        include/logger.h
+        src/logger.cpp
+        src/budget.cpp
+        include/budget.h
 )
 
 set(SOURCE_FILES
-        wishlist.cpp
-        wishlist_manager.cpp
-        file_handler.cpp
-        utils.cpp
-        logger.cpp
-        budget.cpp
+        src/wishlist.cpp
+        src/wishlist_manager.cpp
+        src/file_handler.cpp
+        src/utils.cpp
+        src/logger.cpp
+        src/budget.cpp
 )
 
 # Test executable

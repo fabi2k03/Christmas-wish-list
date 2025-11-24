@@ -3,8 +3,8 @@
 //
 
 #include <gtest/gtest.h>
-#include "../wishlist.h"
-#include "../logger.h"
+#include "../include/wishlist.h"
+#include "../include/logger.h"
 
 class WishItemTest : public ::testing::Test {
 protected:

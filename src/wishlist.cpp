@@ -1,12 +1,12 @@
 //
 // Created by Fabian Kopf on 11.11.25.
 //
-#include "wishlist.h"
+#include "../include/wishlist.h"
 #include <sstream>
 #include <iomanip>
 #include <algorithm>
 #include <iostream>
-#include "logger.h"
+#include "../include/logger.h"
 #include <memory>
 #include <vector>
 

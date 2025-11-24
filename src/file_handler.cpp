@@ -2,8 +2,8 @@
 // Created by Fabian Kopf on 14.11.25.
 //
 
-#include "file_handler.h"
-#include "logger.h"
+#include "../include/file_handler.h"
+#include "../include/logger.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>

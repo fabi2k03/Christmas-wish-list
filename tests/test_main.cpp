@@ -2,7 +2,7 @@
 // Created by Fabian Kopf on 19.11.25.
 //
 #include <gtest/gtest.h>
-#include "../logger.h"
+#include "../include/logger.h"
 
 int main(int argc, char **argv) {
     // Initialize Google Test

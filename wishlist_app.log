@@ -91,3 +91,15 @@
 [2025-11-19 08:47:07] [INFO] ========================================
 [2025-11-19 08:47:07] [INFO] Application exiting normally
 [2025-11-19 08:47:07] [INFO] ========================================
+[2025-11-24 07:51:00] [INFO] ========================================
+[2025-11-24 07:51:00] [INFO] Application started
+[2025-11-24 07:51:00] [INFO] ========================================
+[2025-11-24 07:51:06] [DEBUG] Budget: Default constructor called
+[2025-11-24 07:51:06] [INFO] [WishlistManger] Created for: Fabian#+
+[2025-11-24 07:51:06] [INFO] [FileHandler]: Initialized with filename wishlist_Fabian#+.dat
+[2025-11-24 07:51:06] [INFO] FileHandler: Attempting to load from 'wishlist_Fabian#+.dat'
+[2025-11-24 07:51:06] [WARNING] FileHandler: File 'wishlist_Fabian#+.dat' not found or could not be opened
+[2025-11-24 07:51:12] [INFO] [WishlistManager] Destroying manager with: 0 items
+[2025-11-24 07:51:12] [INFO] ========================================
+[2025-11-24 07:51:12] [INFO] Application exiting normally
+[2025-11-24 07:51:12] [INFO] ========================================

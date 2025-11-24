@@ -2,8 +2,8 @@
 // Created by Fabian Kopf on 19.11.25.
 //
 #include <gtest/gtest.h>
-#include "../file_handler.h"
-#include "../wishlist_manager.h"
+#include "../include/file_handler.h"
+#include "../include/wishlist_manager.h"
 #include "../logger.h"
 #include <fstream>
 #include <filesystem>

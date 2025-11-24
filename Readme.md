@@ -47,7 +47,7 @@ git clone https://github.com/fabi2k03/Christmas-wish-list.git
 cd Christmas-wish-list
 
 # Compile
-g++ -std=c++17 -o wishlist main.cpp wishlist.cpp wishlist_manager.cpp file_handler.cpp utils.cpp
+g++ -std=c++17 -o wishlist src/main.cpp src/wishlist.cpp src/wishlist_manager.cpp src/file_handler.cpp src/utils.cpp src/logger.cpp src/budget.cpp
 
 # Run
 ./wishlist

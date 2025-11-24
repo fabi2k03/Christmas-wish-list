@@ -1,10 +1,10 @@
 #include <iostream>
 #include <valarray>
 
-#include "utils.h"
-#include "wishlist_manager.h"
-#include "file_handler.h"
-#include "logger.h"
+#include "../include/utils.h"
+#include "../include/wishlist_manager.h"
+#include "../include/file_handler.h"
+#include "../include/logger.h"
 
 void displayMenu() {
     std::cout << "\n╔══════════════════════════════════════╗\n";

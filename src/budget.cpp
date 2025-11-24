@@ -2,8 +2,8 @@
 // Created by Fabian Kopf on 20.11.25.
 //
 
-#include "budget.h"
-#include "logger.h"
+#include "../include/budget.h"
+#include "../include/logger.h"
 #include <iomanip>
 #include <sstream>
 #include <cmath>
