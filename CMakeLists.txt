@@ -35,6 +35,7 @@ add_executable(Chistmas_WishList src/main.cpp
         src/budget.cpp
         include/budget.h
         include/database_handler.h
+        src/database_handler.cpp
 )
 
 set(SOURCE_FILES
@@ -44,6 +45,7 @@ set(SOURCE_FILES
         src/utils.cpp
         src/logger.cpp
         src/budget.cpp
+        src/database_handler.cpp
 )
 
 # Test executable
