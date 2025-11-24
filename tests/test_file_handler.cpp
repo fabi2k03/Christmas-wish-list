@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "../include/file_handler.h"
 #include "../include/wishlist_manager.h"
-#include "../logger.h"
+#include "../include/logger.h"
 #include <fstream>
 #include <filesystem>
 

@@ -2,11 +2,11 @@
 // Created by Fabian Kopf on 19.11.25.
 //
 #include <gtest/gtest.h>
-#include "../wishlist.h"
-#include "../wishlist_manager.h"
-#include "../file_handler.h"
-#include "../logger.h"
-#include "test_helpers.h"
+#include "../include/wishlist.h"
+#include "../include/wishlist_manager.h"
+#include "../include/file_handler.h"
+#include "../include/logger.h"
+#include "../include/test_helpers.h"
 #include <filesystem>
 
 class IntegrationTest : public ::testing::Test {

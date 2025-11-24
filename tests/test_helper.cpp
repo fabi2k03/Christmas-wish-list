@@ -6,7 +6,7 @@
 
 #include <memory>
 #include "../include/wishlist.h"
-#include "../wishlist_manager.h"
+#include "../include/wishlist_manager.h"
 
 namespace TestHelpers {
     // Helper to create a test item with default values
