@@ -4,6 +4,7 @@
 
 #include "../include/wishlist_manager.h"
 #include "../include/logger.h"
+#include "../include/database_handler.h"
 
 #include <iostream>
 #include <map>
@@ -334,3 +335,50 @@ void WishlistManager::updateBudgetFromItems() {
     syncBudgetWithPurchases();
 }
 
+void WishlistManager::setDatabaseHandler(DatabaseHandler *handler) {
+    dbHandler = handler;
+    LOG_INFO("WishlistManager: Database handler set for user: ", owner);
+}
+
+bool WishlistManager::saveToDatabase() {
+    if (!dbHandler) {
+        LOG_ERROR("WishlistManager: No database handler set");
+        return false;
+    }
+
+    //Save all items
+    for (const auto &item: items) {
+        if (!dbHandler->saveItem(*item, owner)) {
+            LOG_ERROR("WishlistManager: Failed to save item: ", item->getName());
+            return false;
+        }
+    }
+
+    //Save budget
+    if (!dbHandler->saveBudget(budget, owner)) {
+        LOG_ERROR("WishlistManager: Failed to save budget");
+        return false;
+    }
+
+    LOG_INFO("WishlistManager: Successfully saved all data to database");
+    return true;
+}
+
+bool WishlistManager::loadFromDatabase() {
+    if (!dbHandler) {
+        LOG_ERROR("WishlistManager: No database handler set");
+        return false;
+    }
+
+    items.clear();
+
+    auto loadedItems = dbHandler->loadItems(owner);
+    for (auto &item: loadedItems) {
+        items.push_back(std::move(item));
+    }
+
+    budget = dbHandler->loadBudget(owner);
+
+    LOG_INFO("WishlistManager: Successfully loaded data from database");
+    return true;
+}
