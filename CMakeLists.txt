@@ -58,14 +58,17 @@ add_executable(wishlist_tests
 )
 
 # Link Google Test
-target_link_libraries(wishlist_tests
+target_link_libraries(wishlist_tests PRIVATE
         GTest::gtest_main
+        sqlite3
 )
+
 
 # For macOS/Linux - Threading support
 if(UNIX)
-    target_link_libraries(Chistmas_WishList pthread)
-    target_link_libraries(wishlist_tests pthread)
+    # Verwenden Sie PRIVATE, das ist der Standard
+    target_link_libraries(Chistmas_WishList PRIVATE pthread sqlite3)
+    target_link_libraries(wishlist_tests PRIVATE pthread)
 endif()
 
 # Register tests with CTest
