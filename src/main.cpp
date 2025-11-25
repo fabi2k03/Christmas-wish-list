@@ -1,11 +1,14 @@
 #include <iostream>
 #include <valarray>
+#include <memory>
 
 #include "../include/utils.h"
 #include "../include/wishlist_manager.h"
 #include "../include/file_handler.h"
+
 #include "../include/logger.h"
 #include "../include/database_handler.h"
+
 
 void displayMenu() {
     std::cout << "\n╔══════════════════════════════════════╗\n";
@@ -21,8 +24,8 @@ void displayMenu() {
     std::cout << "8.    Remove Item\n";
     std::cout << "9.    View Statistics\n";
     std::cout << "10.   Sort Items\n";
-    std::cout << "11.   Save Wishlist\n";
-    std::cout << "12.   Load Wishlist\n";
+    std::cout << "11.   Save Wishlist (Database)\n";
+    std::cout << "12.   Load Wishlist (Database)\n";
     std::cout << "13.   Export to CSV\n";
     std::cout << "14.   Import from CSV\n";
     std::cout << "15.   Switch User\n";
@@ -210,25 +213,6 @@ void sortMenu(WishlistManager &manager) {
     manager.displayAll();
 }
 
-void saveWishlist(WishlistManager &manager, FileHandler &fileHandler) {
-    if (fileHandler.save(manager)) {
-        std::cout << "Wishlist saved successfully!\n";
-    } else {
-        std::cout << "Failed to save wishlist!\n";
-    }
-}
-
-void loadWishlist(WishlistManager &manager, FileHandler &fileHandler) {
-    if (Utils::confirm("This will replace current wishlist. Continue?")) {
-        if (fileHandler.load(manager)) {
-            std::cout << "✓ Wishlist loaded successfully!\n";
-            manager.displayAll();
-        } else {
-            std::cout << "✗ Failed to load wishlist!\n";
-        }
-    }
-}
-
 void exportToCSV(WishlistManager &manager, FileHandler &fileHandler) {
     std::string filename = Utils::getStringInput("Enter CSV filename (e.g., wishlist.csv): ");
 
@@ -260,11 +244,13 @@ void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::str
             return;
         }
     } else {
-        fileHandler->save(*manager);
-        std::cout << "Wishlist saved for " << currentOwner << std::endl;
+        if (manager->saveToDatabase()) {
+            std::cout << "Wishlist saved to database for " << currentOwner << std::endl;
+        } else {
+            std::cout << "Failed to save wishlist to database for " << currentOwner << std::endl;
+        }
     }
 
-    //Get new user
     std::string newOwner = Utils::getStringInput("Enter new username: ");
 
     if (newOwner.empty()) {
@@ -288,7 +274,9 @@ void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::str
     fileHandler = new FileHandler(newFilename);
 
     std::cout << "Switching to " << newOwner << "'s wishlist... " << std::endl;
-    bool loaded = fileHandler->load(*manager);
+
+    bool loaded = manager->loadFromDatabase();
+
     if (loaded) {
         std::cout << "Loaded wishlist for " << newOwner << "\n";
         std::cout << "Found " << manager->getTotalItems() << " item(s).\n";
@@ -296,7 +284,6 @@ void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::str
         std::cout << "Starting fresh wishlist for " << newOwner << "\n";
     }
 }
-
 
 int main() {
     //Config Logger
@@ -322,15 +309,14 @@ int main() {
 
     std::string ownerName = Utils::getStringInput("Enter your name: ");
     std::string filename = "wishlist_" + ownerName + ".dat";
-    std::cout << "\nYour wishlist will be saved to " << filename << std::endl;
+    std::cout << "\nYour wishlist will be saved to database and backed up to " << filename <<
+            " (if file operations used).\n"; // Text angepasst
 
     WishlistManager *manager = new WishlistManager(ownerName);
-    manager->setDatabaseHandler(&dbHandler);
-    manager->loadFromDatabase();
-    FileHandler *fileHandler = new FileHandler(filename);
+    manager->setDatabaseHandler(&dbHandler); // DB-Handler setzen
 
-    std::cout << "\nChecking for existing wishlist...\n";
-    bool loaded = fileHandler->load(*manager);
+    std::cout << "\nChecking for existing wishlist in Database...\n";
+    bool loaded = manager->loadFromDatabase(); // Lade Items und Budget aus DB
 
     if (loaded) {
         std::cout << "Welcome back, " << ownerName << "!" << std::endl;
@@ -338,6 +324,9 @@ int main() {
     } else {
         std::cout << "Starting fresh wishlist for " << ownerName << "!\n";
     }
+
+    FileHandler *fileHandler = new FileHandler(filename);
+
 
     int choice;
     bool running = true;
@@ -378,12 +367,12 @@ int main() {
                 break;
 
             case 7:
-                markAsPurchased(*manager);
+                markAsPurchased(*manager); // Update in DB erfolgt intern
                 Utils::pause();
                 break;
 
             case 8:
-                removeItem(*manager);
+                removeItem(*manager); // Remove in DB erfolgt intern
                 Utils::pause();
                 break;
 
@@ -426,6 +415,7 @@ int main() {
                 break;
             case 15:
                 switchUser(manager, fileHandler, ownerName);
+                manager->setDatabaseHandler(&dbHandler); // DB-Handler für den NEUEN Manager setzen!
                 Utils::pause();
                 break;
             case 16:
@@ -433,8 +423,8 @@ int main() {
                 break;
 
             case 0:
-                if (Utils::confirm("Save before exiting?")) {
-                    fileHandler->save(*manager);
+                if (Utils::confirm("Save to database before exiting?")) {
+                    manager->saveToDatabase();
                 }
                 std::cout << "\n🎄 Merry Christmas! Goodbye! 🎅\n";
                 running = false;

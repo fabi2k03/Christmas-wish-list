@@ -91,6 +91,8 @@ public:
     static std::string priorityToString(Priority prio);
     static Category stringToCategory(const std::string& str);
     static Priority stringToPriority(const std::string& str);
+    static void setNextId(int newId) { nextId = newId; }
+    static int getNextId() { return nextId; }
 };
 
 #endif //CHISTMAS_WISHLIST_WISHLIST_H

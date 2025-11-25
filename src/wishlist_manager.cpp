@@ -379,8 +379,20 @@ bool WishlistManager::loadFromDatabase() {
     items.clear();
 
     auto loadedItems = dbHandler->loadItems(owner);
+    int maxId = 0; // Höchste ID verfolgen
     for (auto &item: loadedItems) {
+        // Die ID des geladenen Items ist wichtig
+        if (item->getId() > maxId) {
+            maxId = item->getId();
+        }
         items.push_back(std::move(item));
+    }
+    if (maxId > 0) {
+        WishItem::setNextId(maxId + 1);
+        LOG_INFO("WishlistManager: Set next item ID to: ", maxId + 1);
+    } else {
+        WishItem::setNextId(1);
+        LOG_INFO("WishlistManager: No items loaded, ID counter reset/defaulted.");
     }
 
     budget = dbHandler->loadBudget(owner);
