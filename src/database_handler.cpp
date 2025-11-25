@@ -57,7 +57,7 @@ bool DatabaseHandler::createTables() {
     )";
 
     const char *createBudgetTable = R"(
-        CREATE TABLE IF NOT EXISTS (
+        CREATE TABLE IF NOT EXISTS budgets(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER UNIQUE NOT NULL,
             max_budget REAL DEFAULT 0.0,
@@ -284,6 +284,7 @@ std::vector<std::unique_ptr<WishItem> > DatabaseHandler::loadItems(const std::st
     sqlite3_bind_int(stmt, 1, userId);
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         auto item = std::make_unique<WishItem>();
+        item->setId(sqlite3_column_int(stmt, 0));
         // For now, we'll create items and they'll get new IDs
         // In production, you'd want to add a setId() method or use a factory
         std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));

@@ -92,6 +92,10 @@ public:
     void setDatabaseHandler(DatabaseHandler *handler);
     bool saveToDatabase();
     bool loadFromDatabase();
+
+    DatabaseHandler* getDatabaseHandler() const {
+        return dbHandler;
+    }
 };
 
 #endif //CHISTMAS_WISHLIST_WISHLIST_MANAGER_H

@@ -23,6 +23,9 @@ void WishlistManager::addItem(std::unique_ptr<WishItem> item) {
     if (item) {
         LOG_INFO("[WishlistManager] Adding item: ", item->getName());
         items.push_back(std::move(item));
+        if (dbHandler) {
+            dbHandler->saveItem(*items.back(), owner);
+        }
     }
 }
 
@@ -32,6 +35,7 @@ bool WishlistManager::removeItem(int id) {
     });
     if (it != items.end()) {
         LOG_INFO("[WishlistManager] Removing item ID: ", id);
+        if (dbHandler) dbHandler->deleteItem(id, owner);
         items.erase(it);
         return true;
     }
@@ -212,8 +216,10 @@ void WishlistManager::displayStatistics() const {
 
 void WishlistManager::setBudget(double amount) {
     budget.setMaxBudget(amount);
+    if (dbHandler) dbHandler->saveBudget(budget, owner);
     syncBudgetWithPurchases();
     LOG_INFO("WishlistManager: Budget set to ", amount, " for user ", owner);
+
 }
 
 Budget &WishlistManager::getBudget() {

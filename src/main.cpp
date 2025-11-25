@@ -5,6 +5,7 @@
 #include "../include/wishlist_manager.h"
 #include "../include/file_handler.h"
 #include "../include/logger.h"
+#include "../include/database_handler.h"
 
 void displayMenu() {
     std::cout << "\n╔══════════════════════════════════════╗\n";
@@ -28,7 +29,8 @@ void displayMenu() {
     std::cout << "16.   Budget Management \n";
     std::cout << "0.    Exit\n";
 }
-void budgetMenu(WishlistManager  &manager) {
+
+void budgetMenu(WishlistManager &manager) {
     while (true) {
         std::cout << "\n╔══════════════════════════════════════╗\n";
         std::cout << "║       💰 BUDGET MANAGEMENT 💰        ║\n";
@@ -59,7 +61,7 @@ void budgetMenu(WishlistManager  &manager) {
             case 3:
                 manager.enableBudget();
                 std::cout << "Budget tracking enabled!\n";
-                 manager.displayBudgetStatus();
+                manager.displayBudgetStatus();
                 Utils::pause();
                 break;
             case 4:
@@ -158,6 +160,8 @@ void markAsPurchased(WishlistManager &manager) {
     } else {
         std::cout << "Error: Item with ID " << id << " not found!\n";
     }
+    if (manager.getDatabaseHandler())
+        manager.getDatabaseHandler()->updateItem(*item, manager.getOwner());
 }
 
 void removeItem(WishlistManager &manager) {
@@ -309,11 +313,20 @@ int main() {
     std::cout << "║  Welcome to Christmas Wishlist App  ║\n";
     std::cout << "╚══════════════════════════════════════╝\n\n";
 
+    //Initialize database
+    DatabaseHandler dbHandler("wishlist.db");
+    if (!dbHandler.initialize()) {
+        std::cerr << "Failed to initialize database!\n";
+        return 1;
+    }
+
     std::string ownerName = Utils::getStringInput("Enter your name: ");
     std::string filename = "wishlist_" + ownerName + ".dat";
     std::cout << "\nYour wishlist will be saved to " << filename << std::endl;
 
     WishlistManager *manager = new WishlistManager(ownerName);
+    manager->setDatabaseHandler(&dbHandler);
+    manager->loadFromDatabase();
     FileHandler *fileHandler = new FileHandler(filename);
 
     std::cout << "\nChecking for existing wishlist...\n";
@@ -385,12 +398,20 @@ int main() {
                 break;
 
             case 11:
-                saveWishlist(*manager, *fileHandler);
+                if (manager->saveToDatabase()) {
+                    std::cout << "✓ Saved to database!\n";
+                } else {
+                    std::cout << "✗ Failed to save database!\n";
+                }
                 Utils::pause();
                 break;
 
             case 12:
-                loadWishlist(*manager, *fileHandler);
+                if (manager->loadFromDatabase()) {
+                    std::cout << "✓ Loaded from database!\n";
+                } else {
+                    std::cout << "✗ Could not load from database!\n";
+                }
                 Utils::pause();
                 break;
 
