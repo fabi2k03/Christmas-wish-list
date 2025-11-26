@@ -236,18 +236,18 @@ void importFromCSV(WishlistManager &manager, FileHandler &fileHandler) {
     }
 }
 
-void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::string &currentOwner) {
+void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::string &currentOwner, DatabaseHandler *dbHandler) {
     std::cout << "=== SWITCH USER ===" << std::endl;
 
-    if (!Utils::confirm("Do you want to save the current wishlist before switching?")) {
-        if (!Utils::confirm("All unsaved changes will be lost. Continue?")) {
-            return;
-        }
-    } else {
-        if (manager->saveToDatabase()) {
-            std::cout << "Wishlist saved to database for " << currentOwner << std::endl;
-        } else {
-            std::cout << "Failed to save wishlist to database for " << currentOwner << std::endl;
+    if (manager) {
+        if (!Utils::confirm("Save current wishlist before switching??")) {
+            if (manager->saveToDatabase()){
+                std::cout << "Saved wishlist for "<< currentOwner << " to DB." << std::endl;
+                LOG_INFO("Wishlist saved to database for user: ", currentOwner);
+            } else {
+                std::cout << "Failed to save wishlist for " << currentOwner << " to DB." << std::endl;
+                LOG_ERROR("Failed to save wishlist for user: ", currentOwner);
+            }
         }
     }
 
@@ -267,13 +267,13 @@ void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::str
     delete manager;
     delete fileHandler;
 
-    std::string newFilename = "wishlist_" + newOwner + ".dat";
     currentOwner = newOwner;
 
     manager = new WishlistManager(newOwner);
-    fileHandler = new FileHandler(newFilename);
+    manager->setDatabaseHandler(dbHandler);
 
-    std::cout << "Switching to " << newOwner << "'s wishlist... " << std::endl;
+    //Ensure user exists in database
+    dbHandler->createUser(newOwner);
 
     bool loaded = manager->loadFromDatabase();
 
@@ -283,6 +283,9 @@ void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::str
     } else {
         std::cout << "Starting fresh wishlist for " << newOwner << "\n";
     }
+
+    std::string filename = "wishlist_" + newOwner + ".dat";
+    fileHandler = new FileHandler(filename);
 }
 
 int main() {
@@ -414,7 +417,7 @@ int main() {
                 Utils::pause();
                 break;
             case 15:
-                switchUser(manager, fileHandler, ownerName);
+                switchUser(manager, fileHandler, ownerName, &dbHandler);
                 manager->setDatabaseHandler(&dbHandler); // DB-Handler für den NEUEN Manager setzen!
                 Utils::pause();
                 break;
