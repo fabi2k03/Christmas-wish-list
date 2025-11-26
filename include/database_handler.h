@@ -64,6 +64,8 @@ public:
 
     bool vacuum(); //Optimize database
     std::string getLastError() const;
+
+    int getGlobalMaxItemId();
 };
 
 #endif //CHISTMAS_WISHLIST_DATABASE_HANDLER_H

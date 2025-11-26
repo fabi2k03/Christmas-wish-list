@@ -26,10 +26,8 @@ void displayMenu() {
     std::cout << "10.   Sort Items\n";
     std::cout << "11.   Save Wishlist (Database)\n";
     std::cout << "12.   Load Wishlist (Database)\n";
-    std::cout << "13.   Export to CSV\n";
-    std::cout << "14.   Import from CSV\n";
-    std::cout << "15.   Switch User\n";
-    std::cout << "16.   Budget Management \n";
+    std::cout << "13.   Switch User\n";
+    std::cout << "14.   Budget Management \n";
     std::cout << "0.    Exit\n";
 }
 
@@ -213,29 +211,6 @@ void sortMenu(WishlistManager &manager) {
     manager.displayAll();
 }
 
-void exportToCSV(WishlistManager &manager, FileHandler &fileHandler) {
-    std::string filename = Utils::getStringInput("Enter CSV filename (e.g., wishlist.csv): ");
-
-    if (fileHandler.exportToCSV(manager, filename)) {
-        std::cout << "✓ Exported to " << filename << " successfully!\n";
-    } else {
-        std::cout << "✗ Failed to export to CSV!\n";
-    }
-}
-
-void importFromCSV(WishlistManager &manager, FileHandler &fileHandler) {
-    std::string filename = Utils::getStringInput("Enter CSV filename to import: ");
-
-    if (Utils::confirm("This will ADD items to current wishlist. Continue?")) {
-        if (fileHandler.importFromCSV(manager, filename)) {
-            std::cout << "✓ Imported from " << filename << " successfully!\n";
-            manager.displayAll();
-        } else {
-            std::cout << "✗ Failed to import from CSV!\n";
-        }
-    }
-}
-
 void switchUser(WishlistManager * &manager, FileHandler * &fileHandler, std::string &currentOwner, DatabaseHandler *dbHandler) {
     std::cout << "=== SWITCH USER ===" << std::endl;
 
@@ -336,7 +311,7 @@ int main() {
 
     while (running) {
         displayMenu();
-        choice = Utils::getIntInput("\nYour choice: ", 0, 16);
+        choice = Utils::getIntInput("\nYour choice: ", 0, 14);
 
         switch (choice) {
             case 1:
@@ -406,22 +381,12 @@ int main() {
                 }
                 Utils::pause();
                 break;
-
             case 13:
-                exportToCSV(*manager, *fileHandler);
-                Utils::pause();
-                break;
-
-            case 14:
-                importFromCSV(*manager, *fileHandler);
-                Utils::pause();
-                break;
-            case 15:
                 switchUser(manager, fileHandler, ownerName, &dbHandler);
                 manager->setDatabaseHandler(&dbHandler); // DB-Handler für den NEUEN Manager setzen!
                 Utils::pause();
                 break;
-            case 16:
+            case 14:
                 budgetMenu(*manager);
                 break;
 

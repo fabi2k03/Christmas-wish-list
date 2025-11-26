@@ -186,46 +186,63 @@ std::vector<std::string> DatabaseHandler::getAllUsers() {
 }
 
 bool DatabaseHandler::saveItem(const WishItem &item, const std::string &owner) {
-    //Ensure user exists
-    if (!createUser(owner)) {
-        return false;
-    }
-
+    // Ensure user exists
+    if (!createUser(owner)) return false;
     int userId = getUserId(owner);
-    if (userId == -1) {
-        return false;
+    if (userId == -1) return false;
+
+    sqlite3_stmt* stmt;
+
+    if (item.getId() == 0) {
+        // ITEM HAS NO ID → INSERT NEW
+        const char* sql =
+            "INSERT INTO items (user_id, name, price, purchased, category, priority, notes, link) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+
+        if (!prepareStatement(sql, &stmt)) return false;
+
+        sqlite3_bind_int(stmt, 1, userId);
+        sqlite3_bind_text(stmt, 2, item.getName().c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_double(stmt, 3, item.getPrice());
+        sqlite3_bind_int(stmt, 4, item.isPurchased());
+        sqlite3_bind_int(stmt, 5, (int)item.getCategory());
+        sqlite3_bind_int(stmt, 6, (int)item.getPriority());
+        sqlite3_bind_text(stmt, 7, item.getNotes().c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 8, item.getLink().c_str(), -1, SQLITE_TRANSIENT);
+
+        int result = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+        if (sqlite3_changes(db) == 0) {
+            LOG_ERROR("UPDATE did not modify any row!");
+        }
+        if (result != SQLITE_DONE) return false;
+
+        int newId = sqlite3_last_insert_rowid(db);
+        const_cast<WishItem&>(item).setId(newId);
+        return true;
+    } else {
+        // ITEM EXISTS → UPDATE
+        const char* sql =
+            "UPDATE items SET name=?, price=?, purchased=?, category=?, priority=?, notes=?, link=?, updated_at=CURRENT_TIMESTAMP "
+            "WHERE id=? AND user_id=?;";
+
+        if (!prepareStatement(sql, &stmt)) return false;
+
+        sqlite3_bind_text(stmt, 1, item.getName().c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_double(stmt, 2, item.getPrice());
+        sqlite3_bind_int(stmt, 3, item.isPurchased());
+        sqlite3_bind_int(stmt, 4, (int)item.getCategory());
+        sqlite3_bind_int(stmt, 5, (int)item.getPriority());
+        sqlite3_bind_text(stmt, 6, item.getNotes().c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 7, item.getLink().c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_int(stmt, 8, item.getId());
+        sqlite3_bind_int(stmt, 9, userId);
+
+        int result = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+        return result == SQLITE_DONE;
     }
 
-    const char *sql =
-            R"(INSERT OR REPLACE INTO items (id, user_id, name, price, purchased, category, priority, notes, link, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
-    )";
-
-    sqlite3_stmt *stmt;
-    if (!prepareStatement(sql, &stmt)) {
-        return false;
-    }
-
-    sqlite3_bind_int(stmt, 1, item.getId());
-    sqlite3_bind_int(stmt, 2, userId);
-    sqlite3_bind_text(stmt, 3, item.getName().c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_double(stmt, 4, item.getPrice());
-    sqlite3_bind_int(stmt, 5, item.isPurchased());
-    sqlite3_bind_int(stmt, 6, static_cast<int>(item.getCategory()));
-    sqlite3_bind_int(stmt, 7, static_cast<int>(item.getPriority()));
-    sqlite3_bind_text(stmt, 8, item.getNotes().c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 9, item.getLink().c_str(), -1, SQLITE_TRANSIENT);
-
-    int result = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-
-    if (result != SQLITE_DONE) {
-        LOG_ERROR("DatabaseHandler: Failed to save item: ", sqlite3_errmsg(db));
-        return false;
-    }
-
-    LOG_DEBUG("DatabaseHandler: Item saved - ID: ", item.getId(), " Name: ", item.getName());
-    return true;
 }
 
 bool DatabaseHandler::updateItem(const WishItem &item, const std::string &owner) {
@@ -470,6 +487,24 @@ std::string DatabaseHandler::getLastError() const {
         return sqlite3_errmsg(db);
     }
     return "Database not initialized";
+}
+
+int DatabaseHandler::getGlobalMaxItemId() {
+    const char *sql = "SELECT MAX(id) FROM items;";
+    sqlite3_stmt *stmt;
+
+    if (!prepareStatement(sql, &stmt)) {
+        return 0;
+    }
+
+    int maxId = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        maxId = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    LOG_DEBUG("DatabaseHandler: Global max Item ID found: ", maxId);
+    return maxId;
 }
 
 

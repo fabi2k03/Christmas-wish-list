@@ -378,21 +378,20 @@ bool WishlistManager::loadFromDatabase() {
 
     items.clear();
 
-    auto loadedItems = dbHandler->loadItems(owner);
-    int maxId = 0; // Höchste ID verfolgen
-    for (auto &item: loadedItems) {
-        // Die ID des geladenen Items ist wichtig
-        if (item->getId() > maxId) {
-            maxId = item->getId();
-        }
-        items.push_back(std::move(item));
-    }
-    if (maxId > 0) {
-        WishItem::setNextId(maxId + 1);
-        LOG_INFO("WishlistManager: Set next item ID to: ", maxId + 1);
+    int globalMaxId = dbHandler->getGlobalMaxItemId();
+
+    if (globalMaxId > 0) {
+        WishItem::setNextId(globalMaxId + 1);
+        LOG_INFO("WishlistManager: Synchronized next item ID to: ", globalMaxId + 1, " (based on global max).");
     } else {
         WishItem::setNextId(1);
-        LOG_INFO("WishlistManager: No items loaded, ID counter reset/defaulted.");
+        LOG_INFO("WishlistManager: No items globally, ID counter set to 1.");
+    }
+
+    auto loadedItems = dbHandler->loadItems(owner);
+    for (auto &item: loadedItems) {
+
+        items.push_back(std::move(item));
     }
 
     budget = dbHandler->loadBudget(owner);

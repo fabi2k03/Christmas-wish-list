@@ -13,7 +13,7 @@
 int WishItem::nextId = 1;
 
 WishItem::WishItem()
-    : id(nextId++), name(""), price(0.0), purchased(false), category(Category::OTHER), priority(Priority::MEDIUM),
+    : id(0), name(""), price(0.0), purchased(false), category(Category::OTHER), priority(Priority::MEDIUM),
       notes(""), link("") {
     LOG_DEBUG("WishItem: Default constructor called (ID: ", id, ")");
 }
