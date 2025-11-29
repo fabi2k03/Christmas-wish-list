@@ -29,7 +29,7 @@ WishItem::~WishItem() {
 }
 
 WishItem::WishItem(const WishItem &other)
-    : id(nextId++), name(other.name), price(other.price), purchased(other.purchased), category(other.category),
+    : id(other.id), name(other.name), price(other.price), purchased(other.purchased), category(other.category),
       priority(other.priority), notes(other.notes), link(other.link) {
     LOG_DEBUG("[WishItem] Copy constructor called (New ID: " , id , ", From: " , other.id , ")");
 }
