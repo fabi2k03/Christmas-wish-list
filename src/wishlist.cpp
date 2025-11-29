@@ -29,7 +29,7 @@ WishItem::~WishItem() {
 }
 
 WishItem::WishItem(const WishItem &other)
-    : id(other.id), name(other.name), price(other.price), purchased(other.purchased), category(other.category),
+    : id(nextId++), name(other.name), price(other.price), purchased(other.purchased), category(other.category),
       priority(other.priority), notes(other.notes), link(other.link) {
     LOG_DEBUG("[WishItem] Copy constructor called (New ID: " , id , ", From: " , other.id , ")");
 }
@@ -50,7 +50,7 @@ WishItem &WishItem::operator=(const WishItem &other) {
 }
 
 WishItem::WishItem(WishItem &&other) noexcept
-    : id(nextId++), name(std::move(other.name)), price(other.price),
+    : id(other.id), name(std::move(other.name)), price(other.price),
       purchased(other.purchased), category(other.category),
       priority(other.priority), notes(std::move(other.notes)),
       link(std::move(other.link)) {
@@ -61,7 +61,7 @@ WishItem::WishItem(WishItem &&other) noexcept
 
 WishItem &WishItem::operator=(WishItem &&other) noexcept {
     if (this != &other) {
-        id = other.id;
+        id = nextId++;
         name = std::move(other.name);
         price = other.price;
         purchased = other.purchased;

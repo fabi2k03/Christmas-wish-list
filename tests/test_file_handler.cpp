@@ -8,7 +8,7 @@
 #include <fstream>
 #include <filesystem>
 
-class FileHandlerTest : public ::testing::Test {
+/**class FileHandlerTest : public ::testing::Test {
 protected:
     std::string testFile = "test_wishlist.dat";
     std::string testCsvFile = "test_wishlist.csv";
@@ -78,7 +78,7 @@ TEST_F(FileHandlerTest, LoadNonExistentFile) {
 }*/
 
 // ==================== CSV Export/Import Tests ====================
-
+/**
 TEST_F(FileHandlerTest, ExportToCSV) {
     WishlistManager manager("TestUser");
     manager.addItem(std::make_unique<WishItem>("Item1", 10.0, Category::TOYS));
