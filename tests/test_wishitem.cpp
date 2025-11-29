@@ -47,7 +47,8 @@ TEST_F(WishItemTest, ParameterizedConstructor) {
     EXPECT_EQ(item.getPriority(), Priority::MEDIUM);
 }
 
-/**
+
+// Corrected Test Case
 TEST_F(WishItemTest, CopyConstructor) {
     WishItem original("Book", 29.99, Category::BOOKS);
     original.setPriority(Priority::HIGH);
@@ -57,7 +58,7 @@ TEST_F(WishItemTest, CopyConstructor) {
 
     // IDs should be different (new ID assigned)
     EXPECT_NE(copy.getId(), original.getId());
-    EXPECT_EQ(copy.getId(), original.getId());
+    // REMOVED: EXPECT_EQ(copy.getId(), original.getId()); // <-- Contradiction removed
 
     // But data should be the same
     EXPECT_EQ(copy.getName(), original.getName());
@@ -65,7 +66,7 @@ TEST_F(WishItemTest, CopyConstructor) {
     EXPECT_EQ(copy.getCategory(), original.getCategory());
     EXPECT_EQ(copy.getPriority(), original.getPriority());
     EXPECT_EQ(copy.getNotes(), original.getNotes());
-}**/
+}
 
 TEST_F(WishItemTest, MoveConstructor) {
     WishItem original("Laptop", 1299.99);
