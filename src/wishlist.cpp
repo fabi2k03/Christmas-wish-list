@@ -13,7 +13,7 @@
 int WishItem::nextId = 1;
 
 WishItem::WishItem()
-    : id(nextId++), name(""), price(0.0), purchased(false), category(Category::OTHER), priority(Priority::MEDIUM),
+    : id(0), name(""), price(0.0), purchased(false), category(Category::OTHER), priority(Priority::MEDIUM),
       notes(""), link("") {
     LOG_DEBUG("WishItem: Default constructor called (ID: ", id, ")");
 }
@@ -36,6 +36,7 @@ WishItem::WishItem(const WishItem &other)
 
 WishItem &WishItem::operator=(const WishItem &other) {
     if (this != &other) {
+        id = other.id;
         name = other.name;
         price = other.price;
         purchased = other.purchased;
@@ -60,7 +61,7 @@ WishItem::WishItem(WishItem &&other) noexcept
 
 WishItem &WishItem::operator=(WishItem &&other) noexcept {
     if (this != &other) {
-        id = other.id;
+        id = nextId++;
         name = std::move(other.name);
         price = other.price;
         purchased = other.purchased;

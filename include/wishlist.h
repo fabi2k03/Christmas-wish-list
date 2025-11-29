@@ -4,6 +4,7 @@
 
 #ifndef CHISTMAS_WISHLIST_WISHLIST_H
 #define CHISTMAS_WISHLIST_WISHLIST_H
+
 #include <string>
 #include <memory>
 
@@ -36,14 +37,14 @@ private:
     std::string link;
 
 public:
-    //Constructors
+    // Constructors
     WishItem();
-    WishItem(const std:: string& name, double price, Category cat = Category::OTHER);
+    WishItem(const std::string& name, double price, Category cat = Category::OTHER);
 
-    //Destructor
-     ~WishItem();
+    // Destructor
+    ~WishItem();
 
-    //Copy constructor
+    // Copy constructor
     WishItem(const WishItem& other);
 
     // Copy assignment
@@ -52,7 +53,8 @@ public:
     // Move constructor
     WishItem(WishItem&& other) noexcept;
 
-    WishItem &operator=(WishItem &&other) noexcept;
+    // Move assignment
+    WishItem& operator=(WishItem&& other) noexcept;
 
     // Getters
     int getId() const { return id; }
@@ -72,6 +74,7 @@ public:
     void setPriority(Priority prio);
     void setNotes(const std::string& notes);
     void setLink(const std::string& link);
+    void setId(int newId) { id = newId; }
 
     // Operators
     bool operator<(const WishItem& other) const;
@@ -81,13 +84,15 @@ public:
     // Utility
     std::string toString() const;
     std::string serialize() const;
-    static std::unique_ptr<WishItem> deserialize(const std::string &data);
+    static std::unique_ptr<WishItem> deserialize(const std::string& data);
 
-    //Static helper
+    // Static helper
     static std::string categoryToString(Category cat);
     static std::string priorityToString(Priority prio);
     static Category stringToCategory(const std::string& str);
     static Priority stringToPriority(const std::string& str);
+    static void setNextId(int newId) { nextId = newId; }
+    static int getNextId() { return nextId; }
 };
 
 #endif //CHISTMAS_WISHLIST_WISHLIST_H

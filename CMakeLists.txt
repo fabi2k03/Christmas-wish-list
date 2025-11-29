@@ -34,6 +34,8 @@ add_executable(Chistmas_WishList src/main.cpp
         src/logger.cpp
         src/budget.cpp
         include/budget.h
+        include/database_handler.h
+        src/database_handler.cpp
 )
 
 set(SOURCE_FILES
@@ -43,6 +45,7 @@ set(SOURCE_FILES
         src/utils.cpp
         src/logger.cpp
         src/budget.cpp
+        src/database_handler.cpp
 )
 
 # Test executable
@@ -55,14 +58,17 @@ add_executable(wishlist_tests
 )
 
 # Link Google Test
-target_link_libraries(wishlist_tests
+target_link_libraries(wishlist_tests PRIVATE
         GTest::gtest_main
+        sqlite3
 )
+
 
 # For macOS/Linux - Threading support
 if(UNIX)
-    target_link_libraries(Chistmas_WishList pthread)
-    target_link_libraries(wishlist_tests pthread)
+    # Verwenden Sie PRIVATE, das ist der Standard
+    target_link_libraries(Chistmas_WishList PRIVATE pthread sqlite3)
+    target_link_libraries(wishlist_tests PRIVATE pthread)
 endif()
 
 # Register tests with CTest

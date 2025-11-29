@@ -4,13 +4,14 @@
 
 #include "../include/wishlist_manager.h"
 #include "../include/logger.h"
+#include "../include/database_handler.h"
 
 #include <iostream>
 #include <map>
 #include <ostream>
 #include <iomanip>
 
-WishlistManager::WishlistManager(const std::string &owner) : owner(owner) {
+WishlistManager::WishlistManager(const std::string &owner) : owner(owner), dbHandler(nullptr) {
     LOG_INFO("[WishlistManger] Created for: ", owner);
 }
 
@@ -22,6 +23,9 @@ void WishlistManager::addItem(std::unique_ptr<WishItem> item) {
     if (item) {
         LOG_INFO("[WishlistManager] Adding item: ", item->getName());
         items.push_back(std::move(item));
+        if (dbHandler) {
+            dbHandler->saveItem(*items.back(), owner);
+        }
     }
 }
 
@@ -31,6 +35,7 @@ bool WishlistManager::removeItem(int id) {
     });
     if (it != items.end()) {
         LOG_INFO("[WishlistManager] Removing item ID: ", id);
+        if (dbHandler) dbHandler->deleteItem(id, owner);
         items.erase(it);
         return true;
     }
@@ -211,8 +216,10 @@ void WishlistManager::displayStatistics() const {
 
 void WishlistManager::setBudget(double amount) {
     budget.setMaxBudget(amount);
+    if (dbHandler) dbHandler->saveBudget(budget, owner);
     syncBudgetWithPurchases();
     LOG_INFO("WishlistManager: Budget set to ", amount, " for user ", owner);
+
 }
 
 Budget &WishlistManager::getBudget() {
@@ -334,3 +341,61 @@ void WishlistManager::updateBudgetFromItems() {
     syncBudgetWithPurchases();
 }
 
+void WishlistManager::setDatabaseHandler(DatabaseHandler *handler) {
+    dbHandler = handler;
+    LOG_INFO("WishlistManager: Database handler set for user: ", owner);
+}
+
+bool WishlistManager::saveToDatabase() {
+    if (!dbHandler) {
+        LOG_ERROR("WishlistManager: No database handler set");
+        return false;
+    }
+
+    //Save all items
+    for (const auto &item: items) {
+        if (!dbHandler->saveItem(*item, owner)) {
+            LOG_ERROR("WishlistManager: Failed to save item: ", item->getName());
+            return false;
+        }
+    }
+
+    //Save budget
+    if (!dbHandler->saveBudget(budget, owner)) {
+        LOG_ERROR("WishlistManager: Failed to save budget");
+        return false;
+    }
+
+    LOG_INFO("WishlistManager: Successfully saved all data to database");
+    return true;
+}
+
+bool WishlistManager::loadFromDatabase() {
+    if (!dbHandler) {
+        LOG_ERROR("WishlistManager: No database handler set");
+        return false;
+    }
+
+    items.clear();
+
+    int globalMaxId = dbHandler->getGlobalMaxItemId();
+
+    if (globalMaxId > 0) {
+        WishItem::setNextId(globalMaxId + 1);
+        LOG_INFO("WishlistManager: Synchronized next item ID to: ", globalMaxId + 1, " (based on global max).");
+    } else {
+        WishItem::setNextId(1);
+        LOG_INFO("WishlistManager: No items globally, ID counter set to 1.");
+    }
+
+    auto loadedItems = dbHandler->loadItems(owner);
+    for (auto &item: loadedItems) {
+
+        items.push_back(std::move(item));
+    }
+
+    budget = dbHandler->loadBudget(owner);
+
+    LOG_INFO("WishlistManager: Successfully loaded data from database");
+    return true;
+}

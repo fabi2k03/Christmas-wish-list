@@ -1,56 +1,44 @@
-name: C++ Tests
-
-permissions:
-  contents: read
-  checks: write
+name: CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  test:
+  build-test:
+    name: Build & Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+
     strategy:
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-      # Checkout the repository including submodules
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Install dependencies on Ubuntu
-      - name: Install dependencies (Ubuntu)
+      # Linux dependencies (if needed)
+      - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++
-
-      # Install dependencies on macOS
-      - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install cmake
+        run: sudo apt-get update && sudo apt-get install -y ninja-build g++ cmake
 
       # Configure CMake
-      - name: Configure CMake
-        run: |
-          mkdir -p build
-          cd build
-          cmake ..
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
-      # Build the project
       - name: Build
-        run: |
-          cd build
-          cmake --build . --config Release
+        run: cmake --build build --parallel --config Release
 
-      # Run tests
-      - name: Run Tests
-        run: |
-          cd build
-          ./wishlist_tests
+      # Run tests — DIFFERENT commands for Windows vs Unix!
+      - name: Run tests (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: build
+        run: ctest --output-on-failure --config Release
+
+      - name: Run tests (macOS / Linux)
+        if: matrix.os != 'windows-latest'
+        working-directory: build
+        run: ctest --output-on-failure

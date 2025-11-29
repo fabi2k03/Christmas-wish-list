@@ -11,6 +11,7 @@
 
 #include "wishlist.h"
 #include "budget.h"
+class DatabaseHandler;
 
 enum class SortOrder {
     BY_PRIORITY,
@@ -26,6 +27,7 @@ private:
     std::vector<std::unique_ptr<WishItem>> items;
     std::string owner;
     Budget budget;
+    DatabaseHandler* dbHandler = nullptr;
 
     void updateBudgetFromItems();
 
@@ -85,6 +87,15 @@ public:
     void displayBudgetStatus() const;
     bool checkBudgetBevorAdd(double price) const;
     void syncBudgetWithPurchases();
+
+    //Database methods
+    void setDatabaseHandler(DatabaseHandler *handler);
+    bool saveToDatabase();
+    bool loadFromDatabase();
+
+    DatabaseHandler* getDatabaseHandler() const {
+        return dbHandler;
+    }
 };
 
 #endif //CHISTMAS_WISHLIST_WISHLIST_MANAGER_H
