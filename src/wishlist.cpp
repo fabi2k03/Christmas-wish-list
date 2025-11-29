@@ -36,6 +36,7 @@ WishItem::WishItem(const WishItem &other)
 
 WishItem &WishItem::operator=(const WishItem &other) {
     if (this != &other) {
+        id = nextId++;
         name = other.name;
         price = other.price;
         purchased = other.purchased;
@@ -49,7 +50,7 @@ WishItem &WishItem::operator=(const WishItem &other) {
 }
 
 WishItem::WishItem(WishItem &&other) noexcept
-    : id(other.id), name(std::move(other.name)), price(other.price),
+    : id(nextId++), name(std::move(other.name)), price(other.price),
       purchased(other.purchased), category(other.category),
       priority(other.priority), notes(std::move(other.notes)),
       link(std::move(other.link)) {
