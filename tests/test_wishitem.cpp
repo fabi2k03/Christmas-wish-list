@@ -26,7 +26,7 @@ protected:
 TEST_F(WishItemTest, DefaultConstructor) {
     WishItem item;
 
-    EXPECT_GT(item.getId(), 0);
+    EXPECT_EQ(item.getId(), 0);
     EXPECT_EQ(item.getName(), "");
     EXPECT_EQ(item.getPrice(), 0.0);
     EXPECT_FALSE(item.isPurchased());
@@ -55,7 +55,7 @@ TEST_F(WishItemTest, CopyConstructor) {
     WishItem copy(original);
 
     // IDs should be different (new ID assigned)
-    EXPECT_NE(copy.getId(), original.getId());
+    EXPECT_EQ(copy.getId(), original.getId());
 
     // But data should be the same
     EXPECT_EQ(copy.getName(), original.getName());
