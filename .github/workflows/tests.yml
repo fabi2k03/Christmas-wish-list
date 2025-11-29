@@ -18,38 +18,72 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-      # Checkout the repository including submodules
+      # -----------------------
+      # Checkout
+      # -----------------------
       - uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      # Install dependencies on Ubuntu
+      # -----------------------
+      # Cache for build/_deps (FetchContent)
+      # -----------------------
+      - name: Cache dependencies (GTest etc.)
+        uses: actions/cache@v3
+        with:
+          path: build/_deps
+          key: deps-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
+
+      # -----------------------
+      # Install system deps
+      # -----------------------
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++
+          sudo apt-get install -y cmake g++ ccache
 
-      # Install dependencies on macOS
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew install cmake
+          brew install cmake ccache
 
+      # -----------------------
+      # Enable ccache
+      # -----------------------
+      - name: Setup ccache
+        run: |
+          echo "max_size = 300M" >> ~/.ccache.conf
+          export CCACHE_DIR=~/.ccache
+
+      - name: Cache compiler output (ccache)
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ccache-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ runner.os }}-
+
+      # -----------------------
       # Configure CMake
+      # -----------------------
       - name: Configure CMake
         run: |
           mkdir -p build
           cd build
-          cmake ..
+          cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
 
-      # Build the project
+      # -----------------------
+      # Build
+      # -----------------------
       - name: Build
         run: |
           cd build
-          cmake --build . --config Release
+          cmake --build . --config Release -- -j$(nproc || sysctl -n hw.ncpu)
 
+      # -----------------------
       # Run tests
+      # -----------------------
       - name: Run Tests
         run: |
           cd build
