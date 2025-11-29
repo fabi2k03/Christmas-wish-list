@@ -27,7 +27,7 @@ private:
     std::vector<std::unique_ptr<WishItem>> items;
     std::string owner;
     Budget budget;
-    DatabaseHandler *dbHandler;
+    DatabaseHandler* dbHandler = nullptr;
 
     void updateBudgetFromItems();
 

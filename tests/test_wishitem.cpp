@@ -55,6 +55,7 @@ TEST_F(WishItemTest, CopyConstructor) {
     WishItem copy(original);
 
     // IDs should be different (new ID assigned)
+    EXPECT_NE(copy.getId(), original.getId());
     EXPECT_EQ(copy.getId(), original.getId());
 
     // But data should be the same

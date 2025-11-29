@@ -11,7 +11,7 @@
 #include <ostream>
 #include <iomanip>
 
-WishlistManager::WishlistManager(const std::string &owner) : owner(owner) {
+WishlistManager::WishlistManager(const std::string &owner) : owner(owner), dbHandler(nullptr) {
     LOG_INFO("[WishlistManger] Created for: ", owner);
 }
 
