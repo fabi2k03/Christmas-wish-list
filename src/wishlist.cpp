@@ -36,7 +36,7 @@ WishItem::WishItem(const WishItem &other)
 
 WishItem &WishItem::operator=(const WishItem &other) {
     if (this != &other) {
-        id = nextId++;
+        id = other.id;
         name = other.name;
         price = other.price;
         purchased = other.purchased;
