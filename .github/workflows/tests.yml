@@ -1,90 +1,50 @@
-name: C++ Tests
-
-permissions:
-  contents: read
-  checks: write
+name: CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  test:
+  build-test:
+    name: Build & Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+
     strategy:
+      fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      # -----------------------
-      # Checkout
-      # -----------------------
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+      # Checkout repository
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # -----------------------
-      # Cache for build/_deps (FetchContent)
-      # -----------------------
-      - name: Cache dependencies (GTest etc.)
-        uses: actions/cache@v3
-        with:
-          path: build/_deps
-          key: deps-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
-
-      # -----------------------
-      # Install system deps
-      # -----------------------
-      - name: Install dependencies (Ubuntu)
+      # Install dependencies (Linux only)
+      - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ ccache
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ build-essential ninja-build
 
-      - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install cmake ccache
-
-      # -----------------------
-      # Enable ccache
-      # -----------------------
-      - name: Setup ccache
-        run: |
-          echo "max_size = 300M" >> ~/.ccache.conf
-          export CCACHE_DIR=~/.ccache
-
-      - name: Cache compiler output (ccache)
-        uses: actions/cache@v3
+      # Cache build (improves speed)
+      - name: Cache CMake build
+        uses: actions/cache@v4
         with:
-          path: ~/.ccache
-          key: ccache-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            ccache-${{ runner.os }}-
+          path: |
+            build
+            ~/.cache
+          key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
 
-      # -----------------------
-      # Configure CMake
-      # -----------------------
-      - name: Configure CMake
+      # Configure (CMake)
+      - name: Configure
         run: |
-          mkdir -p build
-          cd build
-          cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ..
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
-      # -----------------------
       # Build
-      # -----------------------
       - name: Build
-        run: |
-          cd build
-          cmake --build . --config Release -- -j$(nproc || sysctl -n hw.ncpu)
+        run: cmake --build build --config Release --parallel
 
-      # -----------------------
-      # Run tests
-      # -----------------------
+      # Run Tests (CTest)
       - name: Run Tests
-        run: |
-          cd build
-          ./wishlist_tests
+        working-directory: build
+        run: ctest --output-on-failure --config Release
